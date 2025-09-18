@@ -1,7 +1,7 @@
 # 金山云企业文化窗口平台
 
 <div align="center">
-  <img src="小kk.gif" alt="小kk - 平台吉祥物" width="120" height="120">
+  <img src="小kk.gif" alt="小kk - 平台吉祥物" width="120" height="150">
   <br>
   <em>👋 大家好！我是小kk，欢迎来到金山云企业文化窗口！</em>
 </div>
