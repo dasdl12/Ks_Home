@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专题工具箱 - 金山云企业文化窗口</title>
+    <!-- 引入统一Header组件样式 -->
+    <link rel="stylesheet" href="components/header.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ks-red: #E60012;
+            --ks-dark: #1A1A1A;
+            --ks-gray: #666666;
+            --ks-light-gray: #F5F5F5;
+            --ks-white: #FFFFFF;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+            color: var(--ks-dark);
+            background: #FAFAFA;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background Decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -20%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(230, 0, 18, 0.03) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.02;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(230, 0, 18, 0.5) 35px, rgba(230, 0, 18, 0.5) 70px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(230, 0, 18, 0.3) 35px, rgba(230, 0, 18, 0.3) 70px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--ks-white);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            height: 72px;
+        }
+
+        .logo {
+            height: 32px;
+            margin-right: 48px;
+        }
+
+        .logo img {
+            height: 100%;
+            width: auto;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 36px;
+            flex: 1;
+        }
+
+        .nav-item {
+            color: var(--ks-dark);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: var(--ks-red);
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--ks-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item:hover::after {
+            width: 100%;
+        }
+
+        .nav-item.active {
+            color: var(--ks-red);
+        }
+
+        .nav-item.active::after {
+            width: 100%;
+        }
+
+        /* Dropdown Menu Styles */
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 140px;
+            box-shadow: var(--shadow-md);
+            border-radius: 8px;
+            padding: 8px 0;
+            z-index: 1001;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-dropdown:hover .dropdown-menu {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 8px 16px;
+            color: var(--ks-dark);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+            border-radius: 0;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(230, 0, 18, 0.05);
+            color: var(--ks-red);
+            padding-left: 20px;
+        }
+
+        .dropdown-item.active {
+            background: rgba(230, 0, 18, 0.1);
+            color: var(--ks-red);
+        }
+
+        .dropdown-item:hover::after {
+            display: none;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .notification-btn {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f8f8f8;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-btn:hover {
+            background: rgba(230, 0, 18, 0.1);
+        }
+
+        .notification-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--ks-red);
+            border-radius: 50%;
+        }
+
+        .header-search-box {
+            position: relative;
+        }
+
+        .header-search-input {
+            padding: 8px 40px 8px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            font-size: 14px;
+            width: 240px;
+            transition: all 0.3s ease;
+        }
+
+        .header-search-input:focus {
+            outline: none;
+            border-color: var(--ks-red);
+            box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.1);
+        }
+
+        .header-search-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+        }
+
+        .user-avatar {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-avatar:hover .user-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-image: url('cd4bd41dc215915e39fa6964ce208923.jpg');
+            background-size: cover;
+            background-position: center;
+            transition: all 0.3s;
+        }
+
+        .user-avatar:hover .avatar-img {
+            box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.2);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            padding: 8px;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+            border: 1px solid #F0F0F0;
+        }
+
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 16px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            transform: rotate(45deg);
+            border-left: 1px solid #F0F0F0;
+            border-top: 1px solid #F0F0F0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--ks-dark);
+        }
+
+        .dropdown-item:hover {
+            background: rgba(230, 0, 18, 0.05);
+            color: var(--ks-red);
+        }
+
+        .dropdown-item img {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .dropdown-item:hover img {
+            opacity: 1;
+        }
+
+        .dropdown-item span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #F0F0F0;
+            margin: 8px 0;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding: 32px 0;
+            background: linear-gradient(135deg, rgba(230, 0, 18, 0.05), rgba(255, 107, 107, 0.05));
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(230, 0, 18, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--ks-red), #FF6B6B);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--ks-gray);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Category Navigation */
+        .category-nav {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            background: var(--ks-light-gray);
+            border-radius: 24px;
+            padding: 4px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: transparent;
+            border: none;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .category-tab.active {
+            background: white;
+            box-shadow: var(--shadow-sm);
+            color: var(--ks-red);
+        }
+
+        .category-description {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--ks-gray);
+        }
+
+        /* Toolkits Grid */
+        .toolkits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
+        }
+
+        .toolkit-card {
+            background: linear-gradient(135deg, white, #FFFBF8);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .toolkit-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(230, 0, 18, 0.03) 0%, transparent 70%);
+            animation: rotate 25s linear infinite;
+        }
+
+        .toolkit-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(230, 0, 18, 0.1);
+        }
+
+        .toolkit-header {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 20px;
+        }
+
+        .toolkit-icon-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .toolkit-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--ks-red), #FF6B6B);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 12px rgba(230, 0, 18, 0.2);
+        }
+
+        .toolkit-title-group {
+            flex: 1;
+        }
+
+        .toolkit-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--ks-dark);
+        }
+
+        .toolkit-subtitle {
+            font-size: 13px;
+            color: var(--ks-gray);
+        }
+
+        .toolkit-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .toolkit-description {
+            position: relative;
+            z-index: 1;
+            font-size: 14px;
+            color: var(--ks-gray);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .toolkit-tools {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 24px;
+        }
+
+        .tools-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--ks-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tools-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: linear-gradient(135deg, var(--ks-red), #FF6B6B);
+            border-radius: 2px;
+        }
+
+        .toolkit-tool-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .toolkit-tool {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(230, 0, 18, 0.1);
+            border-radius: 8px;
+            font-size: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .toolkit-tool:hover {
+            background: rgba(230, 0, 18, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .toolkit-tool-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .toolkit-tool-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .toolkit-tool-name {
+            font-weight: 500;
+            color: var(--ks-dark);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .toolkit-actions {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 10px;
+        }
+
+        .toolkit-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--ks-red), #FF6B6B);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(230, 0, 18, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--ks-light-gray);
+            color: var(--ks-dark);
+            border: 1px solid #E0E0E0;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            border-color: var(--ks-red);
+            color: var(--ks-red);
+        }
+
+        /* Featured Toolkit */
+        .toolkit-card.featured {
+            background: linear-gradient(135deg, #FFFBF0, #FFF8F0);
+            border: 2px solid #FFD700;
+            position: relative;
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        /* Recommendation Section */
+        .recommendations {
+            margin-top: 48px;
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .recommendations-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .recommendations-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .recommendations-title::before {
+            content: '';
+            font-size: 28px;
+        }
+
+        .recommendations-subtitle {
+            font-size: 14px;
+            color: var(--ks-gray);
+        }
+
+        .recommendation-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .recommendation-card {
+            background: #f8f8f8;
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid var(--ks-red);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .recommendation-card:hover {
+            background: linear-gradient(135deg, rgba(230, 0, 18, 0.05), rgba(255, 107, 107, 0.05));
+            transform: translateX(4px);
+        }
+
+        .recommendation-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .recommendation-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--ks-red), #FF6B6B);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .recommendation-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .recommendation-desc {
+            font-size: 14px;
+            color: var(--ks-gray);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .recommendation-tools {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .recommendation-tool {
+            padding: 2px 8px;
+            background: rgba(230, 0, 18, 0.1);
+            color: var(--ks-red);
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--ks-dark);
+            color: white;
+            padding: 48px 0 24px;
+            margin-top: 80px;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 32px;
+        }
+
+        .footer-about h3 {
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .footer-about p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
+        }
+
+        .footer-links h4 {
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .toolkits-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .toolkit-tool-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .category-tabs {
+                justify-content: flex-start;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 8px;
+            }
+            
+            .category-tab {
+                flex-shrink: 0;
+            }
+            
+            .recommendation-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="01-金山 金山云logo-04.png" alt="金山云">
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">首页</a>
+                <div class="nav-dropdown">
+                    <div class="nav-dropdown-trigger">
+                        <a href="#" class="nav-item active">AI工具</a>
+                        <img src="icon/下拉箭头.svg" class="dropdown-arrow" alt="下拉">
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="ai-tools.html" class="dropdown-item">AI工具库</a>
+                        <a href="ai-practices.html" class="dropdown-item">AI实战</a>
+                        <a href="ai-toolkits.html" class="dropdown-item active">专题工具箱</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown forum-dropdown">
+                    <div class="nav-dropdown-trigger">
+                        <a href="论坛/forum.html" class="nav-item">同事论坛</a>
+                        <img src="icon/下拉箭头.svg" class="dropdown-arrow" alt="下拉">
+                    </div>
+                    <div class="dropdown-menu forum-dropdown-menu">
+                        <div class="forum-dropdown-content">
+                            <div class="forum-dropdown-section">
+                                <h4 class="dropdown-section-title">论坛</h4>
+                                <div class="dropdown-items">
+                                    <a href="论坛/forum.html?category=qa" class="dropdown-item">问答回响</a>
+                                    <a href="论坛/forum.html?category=knowledge" class="dropdown-item">知识分享</a>
+                                    <a href="论坛/forum.html?category=life" class="dropdown-item">生活文娱</a>
+                                </div>
+                            </div>
+                            <div class="forum-dropdown-section">
+                                <h4 class="dropdown-section-title">资讯</h4>
+                                <div class="dropdown-items">
+                                    <a href="论坛/forum.html?tab=news&category=company" class="dropdown-item">公司动态</a>
+                                    <a href="论坛/forum.html?tab=news&category=industry" class="dropdown-item">行业资讯</a>
+                                    <a href="论坛/forum.html?tab=news&category=tech" class="dropdown-item">技术前沿</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#" class="nav-item">学习平台</a>
+                <a href="#" class="nav-item">企业活动</a>
+            </nav>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="搜索...">
+                    <button class="search-btn">
+                        <img src="icon/搜索.png" alt="搜索" style="width: 16px; height: 16px;">
+                    </button>
+                </div>
+                <div class="notification-btn">
+                    <img src="icon/通知.png" alt="通知">
+                    <div class="notification-badge"></div>
+                </div>
+                <div class="user-avatar">
+                    <div class="avatar-img" style="background-image: url('cd4bd41dc215915e39fa6964ce208923.jpg'); background-size: cover; background-position: center;"></div>
+                    <div class="user-dropdown">
+                        <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                            <img src="icon/用户.svg" alt="个人中心">
+                            <span>个人中心</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <img src="icon/目标.svg" alt="我的成就">
+                            <span>我的成就</span>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item">
+                            <img src="icon/文件夹.svg" alt="设置">
+                            <span>设置</span>
+                        </div>
+                        <div class="dropdown-item" onclick="logout()">
+                            <img src="icon/时间.svg" alt="退出">
+                            <span>退出登录</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <div class="page-title-icon"><img src="icon/AI工具箱.png" style="width: 30px; height: 30px;" alt="工具箱"></div>
+                专题工具箱
+            </h1>
+            <p class="page-subtitle">按职能和场景精心策划的AI工具组合，一站式解决特定工作需求</p>
+        </div>
+
+        <!-- Category Navigation -->
+        <div class="category-nav">
+            <div class="category-tabs">
+                <button class="category-tab active" onclick="switchCategory('all')">全部工具箱</button>
+                <button class="category-tab" onclick="switchCategory('role')">按职能分类</button>
+                <button class="category-tab" onclick="switchCategory('scenario')">按场景分类</button>
+                <button class="category-tab" onclick="switchCategory('industry')">按行业分类</button>
+            </div>
+            <div class="category-description" id="categoryDescription">
+                探索为不同职能和场景精心策划的AI工具组合，快速找到适合你的解决方案
+            </div>
+        </div>
+
+        <!-- Toolkits Grid -->
+        <div class="toolkits-grid" id="toolkitsGrid">
+            <!-- Toolkits will be loaded dynamically -->
+        </div>
+
+        <!-- Recommendations Section -->
+        <div class="recommendations">
+            <div class="recommendations-header">
+                <h2 class="recommendations-title">个性化推荐</h2>
+                <p class="recommendations-subtitle">基于你的使用习惯和同事反馈，为你推荐合适的工具组合</p>
+            </div>
+            <div class="recommendation-cards" id="recommendationCards">
+                <!-- Recommendations will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <h3>专题工具箱</h3>
+                    <p>为不同职能和工作场景精心策划的AI工具组合，帮助员工快速找到合适的解决方案，提升工作效率。</p>
+                </div>
+                <div class="footer-links">
+                    <h4>工具箱分类</h4>
+                    <ul>
+                        <li><a href="#">职能导向</a></li>
+                        <li><a href="#">场景导向</a></li>
+                        <li><a href="#">行业导向</a></li>
+                        <li><a href="#">技能导向</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>相关资源</h4>
+                    <ul>
+                        <li><a href="ai-tools.html">AI工具库</a></li>
+                        <li><a href="ai-practices.html">AI实战</a></li>
+                        <li><a href="#">使用教程</a></li>
+                        <li><a href="#">工具评测</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>参与贡献</h4>
+                    <ul>
+                        <li><a href="#">推荐工具箱</a></li>
+                        <li><a href="#">分享使用经验</a></li>
+                        <li><a href="#">提出改进建议</a></li>
+                        <li><a href="index.html">返回主页</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 金山云专题工具箱. All Rights Reserved. | 专业工具组合，助力效率提升</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Featured Toolkits Data - Extended with more comprehensive toolkits
+        const toolkitsData = {
+            all: [
+                {
+                    id: 1,
+                    title: '设计师AI提效工具包',
+                    subtitle: '专为设计师量身定制的AI工具集合',
+                    icon: 'icon/设计.png',
+                    category: 'role',
+                    description: '包含AI绘画、UI设计、图像处理等设计工作全流程工具，帮助设计师提升创作效率和作品质量。',
+                    tools: [
+                        { name: 'Midjourney', icon: '12.png', desc: 'AI艺术创作' },
+                        { name: '即梦', icon: '11.png', desc: '中文AI绘画' },
+                        { name: 'Figma AI', icon: '13.png', desc: 'UI设计助手' },
+                        { name: 'Canva AI', icon: '14.png', desc: '平面设计' },
+                        { name: 'Adobe AI', icon: '17.png', desc: '智能修图' },
+                        { name: 'Sketch2Code', icon: '18.png', desc: '设计转代码' }
+                    ],
+                    users: '2.8k',
+                    rating: '4.8',
+                    featured: true
+                },
+                {
+                    id: 2,
+                    title: '产品经理需求分析工具集',
+                    subtitle: '助力产品经理高效完成需求分析',
+                    icon: 'icon/需求分析.png',
+                    category: 'role',
+                    description: '覆盖需求调研、用户画像、竞品分析、原型设计、文档写作等产品工作核心环节的AI工具组合。',
+                    tools: [
+                        { name: 'Notion AI', icon: '4.png', desc: '智能文档' },
+                        { name: 'Miro AI', icon: '5.png', desc: '协作白板' },
+                        { name: 'ChatGPT', icon: '15.png', desc: '需求分析' },
+                        { name: 'Claude', icon: '16.png', desc: '用户调研' },
+                        { name: 'Axure AI', icon: '6.png', desc: '原型设计' },
+                        { name: 'ProcessOn', icon: '7.png', desc: '流程图' }
+                    ],
+                    users: '3.2k',
+                    rating: '4.7',
+                    featured: false
+                },
+                {
+                    id: 3,
+                    title: '开发者编程助手套装',
+                    subtitle: '全方位提升开发效率的AI工具',
+                    icon: 'icon/126-编程.png',
+                    category: 'role',
+                    description: '涵盖代码生成、智能补全、代码审查、测试生成、文档编写等开发全流程的AI辅助工具。',
+                    tools: [
+                        { name: 'Claude Code', icon: '2.png', desc: 'AI编程助手' },
+                        { name: 'GitHub Copilot', icon: '19.png', desc: '代码补全' },
+                        { name: 'Cursor', icon: '20.png', desc: 'AI编辑器' },
+                        { name: 'Tabnine', icon: '22.png', desc: '智能补全' },
+                        { name: 'CodeT5', icon: '23.png', desc: '代码生成' },
+                        { name: 'DeepCode', icon: '24.png', desc: '代码审查' }
+                    ],
+                    users: '4.1k',
+                    rating: '4.9',
+                    featured: true
+                },
+                {
+                    id: 4,
+                    title: '内容创作者工具箱',
+                    subtitle: '为内容创作提供全面AI支持',
+                    icon: 'icon/创作.png',
+                    category: 'role',
+                    description: '文案写作、语法检查、内容优化、多语言翻译、SEO优化等内容创作全链路工具组合。',
+                    tools: [
+                        { name: 'ChatGPT', icon: '15.png', desc: '文案写作' },
+                        { name: 'Jasper', icon: '21.png', desc: '营销文案' },
+                        { name: 'Copy.ai', icon: '8.png', desc: '创意文案' },
+                        { name: 'WPS AI', icon: '3.png', desc: '智能写作' },
+                        { name: 'Grammarly', icon: '9.png', desc: '语法检查' },
+                        { name: 'QuillBot', icon: '10.png', desc: '文本重写' }
+                    ],
+                    users: '2.5k',
+                    rating: '4.6',
+                    featured: false
+                },
+                {
+                    id: 5,
+                    title: '数据分析师AI工具包',
+                    subtitle: '数据洞察与分析的智能化升级',
+                    icon: 'icon/数据分析.png',
+                    category: 'role',
+                    description: '从数据清洗、可视化到预测分析的完整数据科学工作流程AI工具，让数据分析更高效准确。',
+                    tools: [
+                        { name: 'Claude', icon: '16.png', desc: '数据分析' },
+                        { name: 'ChatGPT', icon: '15.png', desc: 'SQL生成' },
+                        { name: 'Tableau AI', icon: '1.png', desc: '智能可视化' },
+                        { name: 'Power BI AI', icon: '2.png', desc: 'BI分析' },
+                        { name: 'Jupyter AI', icon: '3.png', desc: '代码助手' },
+                        { name: 'DataRobot', icon: '4.png', desc: '自动建模' }
+                    ],
+                    users: '1.9k',
+                    rating: '4.5',
+                    featured: false
+                },
+                {
+                    id: 6,
+                    title: '营销运营增长套件',
+                    subtitle: 'AI驱动的营销运营全栈工具',
+                    icon: 'icon/营销.png',
+                    category: 'scenario',
+                    description: '社交媒体管理、广告文案生成、用户画像分析、A/B测试优化等营销运营场景的AI工具集合。',
+                    tools: [
+                        { name: 'Jasper', icon: '21.png', desc: '广告文案' },
+                        { name: 'Copy.ai', icon: '8.png', desc: '营销文案' },
+                        { name: 'Canva AI', icon: '14.png', desc: '营销素材' },
+                        { name: 'ChatGPT', icon: '15.png', desc: '策略分析' },
+                        { name: 'Hootsuite AI', icon: '5.png', desc: '社媒管理' },
+                        { name: 'Optimizely', icon: '6.png', desc: 'A/B测试' }
+                    ],
+                    users: '2.2k',
+                    rating: '4.4',
+                    featured: false
+                },
+                {
+                    id: 7,
+                    title: '客服与销售支持工具箱',
+                    subtitle: '提升客户服务与销售转化的AI助手',
+                    icon: 'icon/客服.png',
+                    category: 'scenario',
+                    description: '智能客服、销售话术生成、客户情绪分析、CRM集成等客服销售场景的AI工具组合。',
+                    tools: [
+                        { name: 'ChatGPT', icon: '15.png', desc: '客服对话' },
+                        { name: 'Claude', icon: '16.png', desc: '销售话术' },
+                        { name: 'Zendesk AI', icon: '7.png', desc: '智能客服' },
+                        { name: 'Salesforce AI', icon: '8.png', desc: 'CRM分析' },
+                        { name: 'Intercom AI', icon: '9.png', desc: '聊天机器人' },
+                        { name: 'HubSpot AI', icon: '10.png', desc: '销售自动化' }
+                    ],
+                    users: '1.7k',
+                    rating: '4.3',
+                    featured: false
+                },
+                {
+                    id: 8,
+                    title: '企业培训与学习发展包',
+                    subtitle: 'AI赋能的企业培训解决方案',
+                    icon: 'icon/企业培训.png',
+                    category: 'scenario',
+                    description: '课程内容生成、个性化学习路径、知识测评、培训效果分析等企业培训场景的AI工具集。',
+                    tools: [
+                        { name: 'Notion AI', icon: '4.png', desc: '培训文档' },
+                        { name: 'ChatGPT', icon: '15.png', desc: '课程设计' },
+                        { name: 'Articulate AI', icon: '11.png', desc: '课件制作' },
+                        { name: 'WPS AI', icon: '3.png', desc: 'PPT生成' },
+                        { name: 'Kahoot AI', icon: '12.png', desc: '互动测验' },
+                        { name: 'Coursera AI', icon: '13.png', desc: '学习推荐' }
+                    ],
+                    users: '1.4k',
+                    rating: '4.2',
+                    featured: false
+                }
+            ]
+        };
+
+        const recommendationsData = [
+            {
+                icon: 'icon/火箭.svg',
+                title: '热门推荐：全栈开发者工具组合',
+                description: '基于你的使用历史，推荐这套包含前后端开发、测试部署的完整工具链。',
+                tools: ['Claude Code', 'GitHub Copilot', 'Cursor', 'Docker AI']
+            },
+            {
+                icon: 'icon/灯泡.svg',
+                title: '效率提升：办公自动化套件',
+                description: '结合你的工作场景，这套工具能显著提升日常办公和文档处理效率。',
+                tools: ['WPS AI', 'Notion AI', 'ChatGPT', 'Grammarly']
+            },
+            {
+                icon: 'icon/目标.svg',
+                title: '新手友好：AI入门工具包',
+                description: '适合刚开始使用AI工具的同事，从这几个工具开始你的AI之旅。',
+                tools: ['ChatGPT', 'WPS AI', 'Canva AI', '即梦']
+            }
+        ];
+
+        let currentCategory = 'all';
+
+        // Initialize page
+        window.addEventListener('DOMContentLoaded', function() {
+            renderToolkits('all');
+            renderRecommendations();
+        });
+
+        // Switch category
+        function switchCategory(category) {
+            currentCategory = category;
+            
+            // Update tab styles
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update description
+            const descriptions = {
+                'all': '探索为不同职能和场景精心策划的AI工具组合，快速找到适合你的解决方案',
+                'role': '按职能分类的专业工具箱，为产品经理、设计师、开发者等不同角色定制',
+                'scenario': '按工作场景分类的实用工具组合，解决特定工作流程中的痛点问题',
+                'industry': '针对不同行业特点定制的AI工具解决方案，行业专用更精准高效'
+            };
+            
+            document.getElementById('categoryDescription').textContent = descriptions[category];
+            
+            // Render toolkits
+            renderToolkits(category);
+        }
+
+        // Render toolkits
+        function renderToolkits(category) {
+            const grid = document.getElementById('toolkitsGrid');
+            
+            let filteredToolkits = toolkitsData.all;
+            
+            if (category !== 'all') {
+                filteredToolkits = toolkitsData.all.filter(toolkit => toolkit.category === category);
+            }
+            
+            grid.innerHTML = filteredToolkits.map(toolkit => `
+                <div class="toolkit-card ${toolkit.featured ? 'featured' : ''} fade-in" onclick="openToolkitDetail(${toolkit.id})">
+                    ${toolkit.featured ? '<div class="featured-badge">精选推荐</div>' : ''}
+                    <div class="toolkit-header">
+                        <div class="toolkit-icon-wrapper">
+                            <div class="toolkit-icon"><img src="${toolkit.icon}" style="width: 28px; height: 28px;" alt=""></div>
+                            <div class="toolkit-title-group">
+                                <div class="toolkit-title">${toolkit.title}</div>
+                                <div class="toolkit-subtitle">${toolkit.subtitle}</div>
+                            </div>
+                        </div>
+                        <div class="toolkit-stats">
+                            <div class="stat-item">
+                                <img src="icon/用户.svg" style="width: 16px; height: 16px;" alt="用户">
+                                <span>${toolkit.users} 用户</span>
+                            </div>
+                            <div class="stat-item">
+                                <img src="icon/明星.svg" style="width: 16px; height: 16px;" alt="评分">
+                                <span>${toolkit.rating} 评分</span>
+                            </div>
+                            <div class="stat-item">
+                                <img src="icon/AI工具箱.png" style="width: 16px; height: 16px;" alt="工具">
+                                <span>${toolkit.tools.length} 个工具</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="toolkit-description">${toolkit.description}</div>
+                    <div class="toolkit-tools">
+                        <div class="tools-title">包含工具</div>
+                        <div class="toolkit-tool-grid">
+                            ${toolkit.tools.map(tool => `
+                                <div class="toolkit-tool" onclick="event.stopPropagation(); openToolDetail('${tool.name}')" title="${tool.desc}">
+                                    <div class="toolkit-tool-icon">
+                                        <img src="logo/${tool.icon}" alt="${tool.name}">
+                                    </div>
+                                    <span class="toolkit-tool-name">${tool.name}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="toolkit-actions">
+                        <button class="toolkit-btn btn-primary" onclick="event.stopPropagation(); useToolkit(${toolkit.id})">
+                            <img src="icon/火箭.svg" style="width: 16px; height: 16px;" alt="使用">
+                            立即使用
+                        </button>
+                        <button class="toolkit-btn btn-secondary" onclick="event.stopPropagation(); collectToolkit(${toolkit.id})">
+                            <span>⭐</span>
+                            收藏
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render recommendations
+        function renderRecommendations() {
+            const container = document.getElementById('recommendationCards');
+            
+            container.innerHTML = recommendationsData.map(rec => `
+                <div class="recommendation-card" onclick="applyRecommendation('${rec.title}')">
+                    <div class="recommendation-header">
+                        <div class="recommendation-icon"><img src="${rec.icon}" style="width: 20px; height: 20px;" alt=""></div>
+                        <div class="recommendation-title">${rec.title}</div>
+                    </div>
+                    <div class="recommendation-desc">${rec.description}</div>
+                    <div class="recommendation-tools">
+                        ${rec.tools.map(tool => `<span class="recommendation-tool">${tool}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Open toolkit detail
+        function openToolkitDetail(toolkitId) {
+            const toolkit = toolkitsData.all.find(t => t.id === toolkitId);
+            if (toolkit) {
+                alert(`即将打开工具箱详情：\n${toolkit.title}\n\n${toolkit.description}\n\n包含 ${toolkit.tools.length} 个AI工具`);
+            }
+        }
+
+        // Open tool detail
+        function openToolDetail(toolName) {
+            alert(`即将跳转到工具详情页：${toolName}`);
+        }
+
+        // Use toolkit
+        function useToolkit(toolkitId) {
+            const toolkit = toolkitsData.all.find(t => t.id === toolkitId);
+            if (toolkit) {
+                alert(`开始使用工具箱：${toolkit.title}\n\n将为您打开所有相关工具的使用指南`);
+            }
+        }
+
+        // Collect toolkit
+        function collectToolkit(toolkitId) {
+            const toolkit = toolkitsData.all.find(t => t.id === toolkitId);
+            if (toolkit) {
+                alert(`已收藏工具箱：${toolkit.title}\n\n您可以在个人中心查看收藏的工具箱`);
+            }
+        }
+
+        // Apply recommendation
+        function applyRecommendation(title) {
+            alert(`应用推荐方案：${title}\n\n将为您自动配置相关工具和设置`);
+        }
+
+        // 添加logout函数
+        function logout() {
+            alert('正在退出登录...');
+            // 实际应用中这里会处理退出登录逻辑
+        }
+    </script>
+    
+    <!-- 引入统一Header组件JavaScript -->
+    <script src="components/header.js"></script>
+</body>
+</html>

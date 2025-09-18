@@ -1,0 +1,3105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>同事论坛 - 金山云企业文化窗口</title>
+
+    <link rel="stylesheet" href="../components/header.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ks-red: #E60012;
+            --ks-dark: #1A1A1A;
+            --ks-gray: #666666;
+            --ks-light-gray: #F5F5F5;
+            --ks-white: #FFFFFF;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+            color: var(--ks-dark);
+            background: #FAFAFA;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background Decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -20%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(230, 0, 18, 0.03) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -30%;
+            left: -10%;
+            width: 60%;
+            height: 60%;
+            background: linear-gradient(135deg, rgba(230, 0, 18, 0.02) 0%, transparent 60%);
+            transform: rotate(45deg);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.02;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(230, 0, 18, 0.5) 35px, rgba(230, 0, 18, 0.5) 70px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(230, 0, 18, 0.3) 35px, rgba(230, 0, 18, 0.3) 70px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 移除重复的header样式定义，使用统一的组件样式 */
+
+        /* 用户头像下拉菜单样式 */
+        .user-avatar {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 200px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-dropdown);
+            border: 1px solid #e5e7eb;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            padding: 8px 0;
+        }
+
+        .user-avatar:hover .user-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 16px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            transform: rotate(45deg);
+            border-left: 1px solid #e5e7eb;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .user-dropdown .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--ks-dark);
+            margin: 0 8px;
+        }
+
+        .user-dropdown .dropdown-item:hover {
+            background: rgba(230, 0, 18, 0.05);
+            color: var(--ks-red);
+        }
+
+        .user-dropdown .dropdown-item img {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .user-dropdown .dropdown-item:hover img {
+            opacity: 1;
+        }
+
+        .user-dropdown .dropdown-item span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #f0f0f0;
+            margin: 8px 16px;
+        }
+
+        /* 通知铃铛样式 */
+        .notification-container {
+            position: relative;
+            margin-right: 16px;
+        }
+
+        .notification-bell {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--ks-white);
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .notification-bell:hover {
+            background: #f9fafb;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--ks-red);
+            border-radius: 50%;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 320px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-dropdown);
+            border: 1px solid #e5e7eb;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .notification-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .notification-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            font-weight: 600;
+            color: var(--ks-dark);
+        }
+
+        .notification-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f9fafb;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background: #f9fafb;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-title {
+            font-size: 14px;
+            color: var(--ks-dark);
+            margin-bottom: 4px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        .notification-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #f3f4f6;
+            text-align: center;
+        }
+
+        .notification-footer button {
+            background: var(--ks-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .notification-footer button:hover {
+            background: #cc0010;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: var(--ks-gray);
+        }
+
+        .breadcrumb a {
+            color: var(--ks-gray);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--ks-red);
+        }
+
+        .breadcrumb .current {
+            color: var(--ks-dark);
+            font-weight: 500;
+        }
+
+        .breadcrumb .fa-angle-right {
+            margin: 0 8px;
+            font-size: 10px;
+        }
+
+        /* Main Layout */
+        .forum-layout {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 24px;
+        }
+
+        .main-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+        }
+
+        /* Switch and Search Bar */
+        .forum-controls {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .tab-switches {
+            display: flex;
+            flex: 2;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            border-radius: 16px;
+            padding: 6px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(230, 0, 18, 0.1);
+        }
+
+        .tab-switch {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        .tab-switch::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(230, 0, 18, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .tab-switch:not(.active):hover::before {
+            left: 100%;
+        }
+
+        .tab-switch.active {
+            background: linear-gradient(135deg, #E60012, #ff1744);
+            color: white;
+            box-shadow: 0 6px 20px rgba(230, 0, 18, 0.4), 0 2px 8px rgba(230, 0, 18, 0.2);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .tab-switch.active::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+            border-radius: 10px;
+            pointer-events: none;
+        }
+
+        .tab-switch:not(.active):hover {
+            background: linear-gradient(135deg, #f1f3f4, #e8eaed);
+            color: #374151;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-switch i {
+            font-size: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .tab-switch.active i {
+            transform: scale(1.1);
+        }
+
+        .search-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .forum-search-input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            height: 36px;
+        }
+
+        .forum-search-input:focus {
+            outline: none;
+            border-color: var(--ks-red);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #86909C;
+        }
+
+        .advanced-search {
+            font-size: 12px;
+            color: var(--ks-gray);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .advanced-search:hover {
+            text-decoration: underline;
+            color: var(--ks-red);
+        }
+
+        /* Category and Function Bar */
+        .category-bar {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .category-filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tag {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: #f5f5f5;
+            color: var(--ks-gray);
+            text-decoration: none;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .category-tag.active {
+            background: rgba(230, 0, 18, 0.1);
+            color: var(--ks-red);
+            font-weight: 600;
+            border: 2px solid rgba(230, 0, 18, 0.3);
+        }
+
+        .category-tag:hover {
+            background: #e8e8e8;
+        }
+
+        /* Subcategory Dropdown */
+        .category-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .subcategory-menu {
+            position: fixed !important;
+            background: white !important;
+            min-width: 160px !important;
+            max-width: 200px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+            border-radius: 12px !important;
+            padding: 8px 0 !important;
+            z-index: 999999 !important;
+            display: none !important;
+            border: 1px solid #e5e7eb !important;
+            backdrop-filter: blur(10px) !important;
+            margin-top: 4px !important;
+        }
+
+        .category-dropdown.active .subcategory-menu {
+            display: block !important;
+        }
+
+        /* 调试用的可见样式 */
+        .subcategory-menu.debug-visible {
+            display: block;
+            background: yellow;
+            border: 2px solid red;
+        }
+
+        .subcategory-item {
+            display: block;
+            padding: 12px 16px;
+            color: #374151;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 2px 6px;
+            position: relative;
+        }
+
+        .subcategory-item:hover {
+            background: linear-gradient(135deg, rgba(230, 0, 18, 0.08), rgba(230, 0, 18, 0.05));
+            color: var(--ks-red);
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(230, 0, 18, 0.1);
+        }
+
+        .subcategory-item:active {
+            transform: translateX(2px) scale(0.98);
+        }
+
+        .bg-neutral-100 {
+            background-color: #f5f5f5;
+        }
+
+        .shadow-dropdown {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .function-area {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .sort-dropdown {
+            position: relative;
+        }
+
+        .sort-btn {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+        }
+
+        .sort-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 120px;
+            box-shadow: var(--shadow-dropdown);
+            border-radius: 8px;
+            padding: 8px 0;
+            margin-top: 4px;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .sort-dropdown.active .sort-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .sort-dropdown-item {
+            display: block;
+            padding: 8px 16px;
+            color: var(--ks-dark);
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .sort-dropdown-item:hover {
+            background: #f5f5f5;
+            color: var(--ks-red);
+        }
+
+        .sort-dropdown-item.active {
+            color: var(--ks-red);
+            background: rgba(230, 0, 18, 0.05);
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            transform: scale(1);
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--ks-red), #ff4757);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(230, 0, 18, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #d40011, #e5002a);
+            box-shadow: 0 6px 20px rgba(230, 0, 18, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: var(--ks-gray);
+        }
+
+        .btn-secondary:hover {
+            background: #e8e8e8;
+        }
+
+        /* Content List */
+        .content-list {
+            padding: 20px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-card:hover {
+            box-shadow: var(--shadow-card-hover);
+            transform: translateY(-1px);
+        }
+
+        /* 置顶帖子样式 */
+        .content-card.pinned {
+            background: white;
+            border: 1px solid #e1e5e9;
+        }
+
+        /* 加精帖子样式 */
+        .content-card.featured {
+            background: white;
+            border: 1px solid #e1e5e9;
+        }
+
+        /* 投票帖子特殊样式 */
+        .content-card.voting {
+            background: white;
+            border: 1px solid #e1e5e9;
+        }
+
+
+        /* 投票标签样式 */
+        .voting-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #6366f1;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .voting-badge i {
+            font-size: 12px;
+        }
+
+        /* 投票进度条样式 */
+        .voting-progress {
+            margin-top: 12px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .voting-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .voting-deadline {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--ks-red), #ff6b7d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .card-meta {
+            flex: 1;
+        }
+
+        .author-name {
+            font-weight: 600;
+            color: var(--ks-dark);
+            font-size: 14px;
+        }
+
+        .post-time {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        .category-badges {
+            display: flex;
+            gap: 6px;
+        }
+
+        .category-badge {
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            background: linear-gradient(135deg, rgba(230, 0, 18, 0.15), rgba(230, 0, 18, 0.08));
+            color: var(--ks-red);
+            border: 1px solid rgba(230, 0, 18, 0.2);
+            margin-right: 6px;
+            display: inline-block;
+        }
+
+        .category-badge:first-child {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.08));
+            color: #3b82f6;
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ks-dark);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .card-title:hover {
+            color: var(--ks-red);
+        }
+
+        .card-content {
+            font-size: 14px;
+            color: var(--ks-gray);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .stats-left {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--ks-gray);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .bookmark-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--ks-gray);
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .bookmark-btn:hover {
+            color: var(--ks-red);
+        }
+
+        /* Pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin: 32px 0;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            min-width: 36px;
+        }
+
+        .page-btn:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .page-btn.active {
+            background: var(--ks-red);
+            color: white;
+            box-shadow: 0 2px 8px rgba(230, 0, 18, 0.3);
+        }
+
+        .page-next {
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .page-next:hover {
+            background: #f3f4f6;
+            color: var(--ks-red);
+        }
+
+        .page-dots {
+            color: #9ca3af;
+            font-weight: 500;
+            padding: 0 4px;
+        }
+
+        /* Right Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: sticky;
+            top: 96px;
+            height: fit-content;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
+            padding: 16px;
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ks-dark);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pinned-badge {
+            background: #E60012;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+
+        .featured-badge {
+            background: #ffd700;
+            color: #8b6914;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+
+        .hot-topic {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .hot-topic:last-child {
+            border-bottom: none;
+        }
+
+        .topic-name {
+            color: var(--ks-dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .topic-name:hover {
+            color: var(--ks-red);
+        }
+
+        .topic-count {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        .active-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: var(--ks-white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .active-user:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .active-user:last-child {
+            margin-bottom: 0;
+        }
+
+        .user-rank {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .rank-1 {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #92400e;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .rank-2 {
+            background: linear-gradient(135deg, #c0c0c0, #e5e7eb);
+            color: #374151;
+            box-shadow: 0 2px 8px rgba(192, 192, 192, 0.3);
+        }
+
+        .rank-3 {
+            background: linear-gradient(135deg, #cd7f32, #d97706);
+            color: white;
+            box-shadow: 0 2px 8px rgba(205, 127, 50, 0.3);
+        }
+
+        .user-avatar-small {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid var(--ks-white);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ks-dark);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-dept {
+            font-size: 12px;
+            color: var(--ks-gray);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-stats {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .user-posts {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ks-red);
+        }
+
+        .user-likes {
+            font-size: 11px;
+            color: var(--ks-gray);
+        }
+
+        .recommended-content {
+            background: rgba(59, 130, 246, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+
+        .recommended-title {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .recommended-desc {
+            font-size: 13px;
+            color: var(--ks-gray);
+            line-height: 1.4;
+        }
+
+        .read-more {
+            color: var(--ks-red);
+            text-decoration: none;
+            font-size: 12px;
+            margin-top: 6px;
+            display: inline-block;
+        }
+
+        /* Footer */
+        .footer {
+            background: white;
+            margin-top: 40px;
+            padding: 20px 0;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copyright {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 16px;
+        }
+
+        .footer-link {
+            font-size: 12px;
+            color: var(--ks-gray);
+            text-decoration: none;
+        }
+
+        .footer-link:hover {
+            color: var(--ks-red);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .forum-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .controls-row {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .tab-switches {
+                flex: none;
+                width: 100%;
+            }
+            
+            .search-container {
+                flex: none;
+                width: 100%;
+            }
+        }
+
+        /* Search Results Styles */
+        .search-results-header {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        .search-results-header h3 {
+            color: var(--ks-dark);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .search-keyword {
+            color: var(--ks-gray);
+            font-size: 14px;
+            background: rgba(230, 0, 18, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(230, 0, 18, 0.2);
+        }
+
+        /* No Results Styles */
+        .no-results {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--ks-gray);
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .no-results-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        .no-results-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ks-dark);
+            margin-bottom: 12px;
+        }
+
+        .no-results-desc {
+            font-size: 16px;
+            color: var(--ks-gray);
+            line-height: 1.5;
+        }
+
+        /* Search Highlight */
+        mark {
+            background: #fff3cd !important;
+            padding: 1px 2px !important;
+            border-radius: 2px !important;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0 16px;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 16px;
+            }
+            
+            .category-bar {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+            
+            .function-area {
+                justify-content: space-between;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+    
+    <!-- 统一静态 Header（与首页一致，路径已从子目录调整为 ../） -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="../01-金山 金山云logo-04.png" alt="金山云">
+            </div>
+            <nav class="nav-menu">
+                <a href="../index.html" class="nav-item">首页</a>
+                <div class="nav-dropdown">
+                    <div class="nav-dropdown-trigger">
+                        <a href="#" class="nav-item">AI工具</a>
+                        <img src="../icon/下拉箭头.svg" class="dropdown-arrow" alt="下拉">
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="../ai-tools.html" class="dropdown-item">AI工具库</a>
+                        <a href="../ai-practices.html" class="dropdown-item">AI实战</a>
+                        <a href="../ai-toolkits.html" class="dropdown-item">专题工具箱</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown forum-dropdown">
+                    <div class="nav-dropdown-trigger">
+                        <a href="./forum.html" class="nav-item active">同事论坛</a>
+                        <img src="../icon/下拉箭头.svg" class="dropdown-arrow" alt="下拉">
+                    </div>
+                    <div class="dropdown-menu forum-dropdown-menu">
+                        <div class="forum-dropdown-content">
+                            <div class="forum-dropdown-section">
+                                <h4 class="dropdown-section-title">论坛</h4>
+                                <div class="dropdown-items">
+                                    <a href="./forum.html?category=qa" class="dropdown-item">问答回响</a>
+                                    <a href="./forum.html?category=knowledge" class="dropdown-item">知识分享</a>
+                                    <a href="./forum.html?category=life" class="dropdown-item">生活文娱</a>
+                                </div>
+                            </div>
+                            <div class="forum-dropdown-section">
+                                <h4 class="dropdown-section-title">资讯</h4>
+                                <div class="dropdown-items">
+                                    <a href="./forum.html?tab=news&category=company" class="dropdown-item">公司大事</a>
+                                    <a href="./forum.html?tab=news&category=culture" class="dropdown-item">文化长廊</a>
+                                    <a href="./forum.html?tab=news&category=tech" class="dropdown-item">技术洞察</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#" class="nav-item">学习平台</a>
+                <a href="#" class="nav-item">企业活动</a>
+            </nav>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="搜索...">
+                    <button class="search-btn">
+                        <img src="../icon/搜索.png" alt="搜索" style="width: 16px; height: 16px;">
+                    </button>
+                </div>
+                <button class="notification-btn">
+                    <img src="../icon/通知.png" alt="通知">
+                    <div class="notification-badge"></div>
+                </button>
+                <div class="user-avatar">
+                    <div class="avatar-img" style="background-image: url('../cd4bd41dc215915e39fa6964ce208923.jpg'); background-size: cover; background-position: center;"></div>
+                    <div class="user-dropdown">
+                        <div class="dropdown-item" onclick="window.location.href='../profile.html'">
+                            <img src="../icon/用户.svg" alt="个人中心">
+                            <span>个人中心</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <img src="../icon/目标.svg" alt="我的成就">
+                            <span>我的成就</span>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item">
+                            <img src="../icon/文件夹.svg" alt="设置">
+                            <span>设置</span>
+                        </div>
+                        <div class="dropdown-item" onclick="logout()">
+                            <img src="../icon/时间.svg" alt="退出">
+                            <span>退出登录</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb">
+            <a href="../index.html">企业大平台</a>
+            <i class="fa fa-angle-right"></i>
+            <a href="forum.html">同事论坛</a>
+            <i class="fa fa-angle-right"></i>
+            <span class="current" id="currentModule">论坛</span>
+        </nav>
+
+        <!-- Main Layout -->
+        <div class="forum-layout">
+            <!-- Main Section -->
+            <div class="main-section">
+                <!-- Controls -->
+                <div class="forum-controls">
+                    <div class="controls-row">
+                        <div class="tab-switches">
+                            <button class="tab-switch active" id="forumTab" onclick="switchTab('forum')">
+                                <i class="fa fa-comments-o"></i>
+                                <span>论坛</span>
+                            </button>
+                            <button class="tab-switch" id="newsTab" onclick="switchTab('news')">
+                                <i class="fa fa-newspaper-o"></i>
+                                <span>资讯</span>
+                            </button>
+                        </div>
+                        <div class="search-container">
+                            <div class="search-input-wrapper">
+                                <i class="fa fa-search search-icon"></i>
+                                <input type="text" class="forum-search-input" id="forumSearchInput" placeholder="搜索论坛帖子...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category and Function Bar -->
+                <div class="category-bar">
+                    <div class="category-filters" id="categoryFilters">
+                        <a href="#" class="category-tag active" data-category="all">
+                            <i class="fa fa-list"></i>
+                            全部
+                        </a>
+                        <div class="category-dropdown">
+                            <a href="#" class="category-tag" data-category="qa">
+                                <i class="fa fa-question-circle"></i>
+                                问答回响
+                                <i class="fa fa-angle-down" style="margin-left: 4px; font-size: 12px;"></i>
+                            </a>
+                            <div class="subcategory-menu shadow-dropdown">
+                                <a href="#" class="subcategory-item bg-neutral-100" data-category="qa" data-subcategory="财务">财务</a>
+                                <a href="#" class="subcategory-item bg-neutral-100" data-category="qa" data-subcategory="IT">IT</a>
+                                <a href="#" class="subcategory-item bg-neutral-100" data-category="qa" data-subcategory="HR">HR</a>
+                                <a href="#" class="subcategory-item bg-neutral-100" data-category="qa" data-subcategory="行政">行政</a>
+                                <a href="#" class="subcategory-item bg-neutral-100" data-category="qa" data-subcategory="其他">其他</a>
+                            </div>
+                        </div>
+                        <div class="category-dropdown">
+                            <a href="#" class="category-tag" data-category="knowledge">
+                                <i class="fa fa-lightbulb-o"></i>
+                                知识分享
+                                <i class="fa fa-angle-down" style="margin-left: 4px; font-size: 12px;"></i>
+                            </a>
+                            <div class="subcategory-menu shadow-dropdown">
+                                <a href="#" class="subcategory-item bg-neutral-100" data-category="knowledge" data-subcategory="研发">研发</a>
+                                <a href="#" class="subcategory-item bg-neutral-100" data-category="knowledge" data-subcategory="产品">产品</a>
+                                <a href="#" class="subcategory-item bg-neutral-100" data-category="knowledge" data-subcategory="AI">AI</a>
+                                <a href="#" class="subcategory-item bg-neutral-100" data-category="knowledge" data-subcategory="通用">通用</a>
+                            </div>
+                        </div>
+                        <div class="category-dropdown">
+                            <a href="#" class="category-tag" data-category="life">
+                                <i class="fa fa-coffee"></i>
+                                生活文娱
+                                <i class="fa fa-angle-down" style="margin-left: 4px; font-size: 12px;"></i>
+                            </a>
+                            <div class="subcategory-menu shadow-dropdown">
+                                <a href="#" class="subcategory-item bg-neutral-100" data-category="life" data-subcategory="market">跳蚤市场</a>
+                                <a href="#" class="subcategory-item bg-neutral-100" data-category="life" data-subcategory="club">社团</a>
+                                <a href="#" class="subcategory-item bg-neutral-100" data-category="life" data-subcategory="other">其他</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="function-area">
+                        <div class="sort-dropdown" onclick="toggleSortDropdown(event)">
+                            <button class="sort-btn" id="sortBtn">
+                                <span id="sortText">最新发布</span>
+                                <i class="fa fa-angle-down"></i>
+                            </button>
+                            <div class="sort-dropdown-menu">
+                                <div class="sort-dropdown-item active" onclick="changeSorting(event, 'latest', '最新发布')">最新发布</div>
+                                <div class="sort-dropdown-item" onclick="changeSorting(event, 'popular', '热门优先')">热门优先</div>
+                                <div class="sort-dropdown-item" onclick="changeSorting(event, 'comments', '最多评论')">最多评论</div>
+                            </div>
+                        </div>
+                        <a href="create-post.html" class="action-btn btn-primary" id="actionBtn">
+                            <i class="fa fa-plus"></i>
+                            发布新帖
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Content List -->
+                <div class="content-list" id="contentList">
+                    <!-- Content will be loaded here -->
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-container">
+                    <div class="pagination">
+                        <button class="page-btn" onclick="changePage(1)">1</button>
+                        <button class="page-btn active" onclick="changePage(2)">2</button>
+                        <button class="page-btn" onclick="changePage(3)">3</button>
+                        <button class="page-btn" onclick="changePage(4)">4</button>
+                        <button class="page-btn" onclick="changePage(5)">5</button>
+                        <span class="page-dots">...</span>
+                        <button class="page-btn" onclick="changePage(10)">10</button>
+                        <button class="page-next" onclick="nextPage()">
+                            <i class="fa fa-angle-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="sidebar">
+                <!-- Recommended Posts/News -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">
+                        <i class="fa fa-fire" style="color: #f59e0b;"></i>
+                        <span id="sidebarTitle">推荐帖子</span>
+                    </h3>
+                    <div class="hot-topic">
+                        <a href="#" class="topic-name">关于新系统部署的技术问题求助</a>
+                        <span class="pinned-badge">置顶</span>
+                    </div>
+                    <div class="hot-topic">
+                        <a href="#" class="topic-name">产品设计中的用户体验优化实践分享</a>
+                        <span class="featured-badge">加精</span>
+                    </div>
+                    <div class="hot-topic">
+                        <a href="#" class="topic-name">公司附近好吃的餐厅推荐</a>
+                        <span class="topic-count">203人</span>
+                    </div>
+                    <div class="hot-topic">
+                        <a href="#" class="topic-name">新员工入职指南分享</a>
+                        <span class="topic-count">156人</span>
+                    </div>
+                </div>
+
+                <!-- Active Users -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">
+                        <i class="fa fa-trophy" style="color: #f59e0b;"></i>
+                        活跃用户
+                    </h3>
+                    <div class="active-user" onclick="window.location.href='user-profile.html?user=张秋实'">
+                        <div class="user-rank rank-1">1</div>
+                        <div class="user-avatar-small" style="background-image: url('../cd4bd41dc215915e39fa6964ce208923.jpg');"></div>
+                        <div class="user-info">
+                            <div class="user-name">张秋实</div>
+                            <div class="user-dept">技术委员会</div>
+                        </div>
+                        <div class="user-stats">
+                            <div class="user-posts">128帖</div>
+                            <div class="user-likes">2.1k赞</div>
+                        </div>
+                    </div>
+                    <div class="active-user" onclick="window.location.href='user-profile.html?user=李盛菲'">
+                        <div class="user-rank rank-2">2</div>
+                        <div class="user-avatar-small" style="background-image: url('../头像/李盛菲-公有云.png');"></div>
+                        <div class="user-info">
+                            <div class="user-name">李盛菲</div>
+                            <div class="user-dept">公有云</div>
+                        </div>
+                        <div class="user-stats">
+                            <div class="user-posts">95帖</div>
+                            <div class="user-likes">1.8k赞</div>
+                        </div>
+                    </div>
+                    <div class="active-user" onclick="window.location.href='user-profile.html?user=高通'">
+                        <div class="user-rank rank-3">3</div>
+                        <div class="user-avatar-small" style="background-image: url('../头像/高通-组织和人力资源.jpg');"></div>
+                        <div class="user-info">
+                            <div class="user-name">高通</div>
+                            <div class="user-dept">组织和人力资源</div>
+                        </div>
+                        <div class="user-stats">
+                            <div class="user-posts">87帖</div>
+                            <div class="user-likes">1.5k赞</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommended Content -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">
+                        <i class="fa fa-star" style="color: var(--ks-red);"></i>
+                        版主推荐
+                    </h3>
+                    <div class="recommended-content">
+                        <h4 class="recommended-title">企业文化建设的重要性</h4>
+                        <p class="recommended-desc">探讨如何在快速发展的科技企业中建立和维护积极向上的企业文化，以及文化对员工凝聚力的影响。</p>
+                        <a href="#" class="read-more">阅读全文</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="copyright">© 2023 企业大平台 版权所有</div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">使用帮助</a>
+                <a href="#" class="footer-link">隐私政策</a>
+                <a href="#" class="footer-link">联系我们</a>
+                <a href="#" class="footer-link">反馈建议</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Current state - Start with forum tab active
+        let currentTab = 'forum';
+        let currentCategory = 'all';
+        let currentSubcategory = null;
+
+        // 通知功能
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notificationDropdown');
+            dropdown.classList.toggle('show');
+            
+            // 点击外部关闭下拉菜单
+            if (dropdown.classList.contains('show')) {
+                document.addEventListener('click', closeNotificationsOnOutsideClick);
+            } else {
+                document.removeEventListener('click', closeNotificationsOnOutsideClick);
+            }
+        }
+
+        function closeNotificationsOnOutsideClick(event) {
+            const dropdown = document.getElementById('notificationDropdown');
+            const bell = document.querySelector('.notification-bell');
+            
+            if (!dropdown.contains(event.target) && !bell.contains(event.target)) {
+                dropdown.classList.remove('show');
+                document.removeEventListener('click', closeNotificationsOnOutsideClick);
+            }
+        }
+
+        // Tab switching function
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-switch').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tab + 'Tab').classList.add('active');
+            
+            // Update search placeholder
+            const searchInput = document.getElementById('forumSearchInput');
+            if (tab === 'news') {
+                searchInput.placeholder = '搜索资讯内容...';
+            } else {
+                searchInput.placeholder = '搜索论坛帖子...';
+            }
+            
+            // Update breadcrumb
+            document.getElementById('currentModule').textContent = tab === 'news' ? '资讯' : '论坛';
+            
+            // Update categories
+            updateCategories(tab);
+            
+            // Update action button
+            updateActionButton(tab);
+            
+            // Load content
+            loadContent(tab, currentCategory);
+        }
+
+        // Update categories based on tab
+        function updateCategories(tab) {
+            const categoryFilters = document.getElementById('categoryFilters');
+            
+            if (tab === 'news') {
+                categoryFilters.innerHTML = `
+                    <a href="#" class="category-tag active" data-category="all">
+                        <i class="fa fa-list"></i>
+                        全部
+                    </a>
+                    <a href="#" class="category-tag" data-category="company">
+                        <i class="fa fa-bullhorn"></i>
+                        公司大事
+                    </a>
+                    <a href="#" class="category-tag" data-category="culture">
+                        <img src="../icon/心形.svg" style="width: 16px; height: 16px;" alt="文化长廊">
+                        文化长廊
+                    </a>
+                    <a href="#" class="category-tag" data-category="tech">
+                        <i class="fa fa-code"></i>
+                        技术洞察
+                    </a>
+                `;
+            } else {
+                categoryFilters.innerHTML = `
+                    <a href="#" class="category-tag active" data-category="all">
+                        <i class="fa fa-list"></i>
+                        全部
+                    </a>
+                    <div class="category-dropdown">
+                        <a href="#" class="category-tag" data-category="qa">
+                            <i class="fa fa-question-circle"></i>
+                            问答回响
+                            <i class="fa fa-angle-down" style="margin-left: 4px; font-size: 12px;"></i>
+                        </a>
+                        <div class="subcategory-menu shadow-dropdown">
+                            <a href="#" class="subcategory-item" data-category="qa" data-subcategory="财务">财务</a>
+                            <a href="#" class="subcategory-item" data-category="qa" data-subcategory="IT">IT</a>
+                            <a href="#" class="subcategory-item" data-category="qa" data-subcategory="HR">HR</a>
+                            <a href="#" class="subcategory-item" data-category="qa" data-subcategory="行政">行政</a>
+                            <a href="#" class="subcategory-item" data-category="qa" data-subcategory="其他">其他</a>
+                        </div>
+                    </div>
+                    <div class="category-dropdown">
+                        <a href="#" class="category-tag" data-category="knowledge">
+                            <img src="../icon/灯泡.svg" style="width: 14px; height: 14px;" alt="灯泡">
+                            知识分享
+                            <img src="../icon/下拉箭头.svg" style="width: 12px; height: 12px; margin-left: 4px;" alt="下拉">
+                        </a>
+                        <div class="subcategory-menu shadow-dropdown">
+                            <a href="#" class="subcategory-item" data-category="knowledge" data-subcategory="研发">研发</a>
+                            <a href="#" class="subcategory-item" data-category="knowledge" data-subcategory="产品">产品</a>
+                            <a href="#" class="subcategory-item" data-category="knowledge" data-subcategory="AI">AI</a>
+                            <a href="#" class="subcategory-item" data-category="knowledge" data-subcategory="通用">通用</a>
+                        </div>
+                    </div>
+                    <div class="category-dropdown">
+                        <a href="#" class="category-tag" data-category="life">
+                            <img src="../icon/生活.png" style="width: 14px; height: 14px;" alt="咖啡">
+                            生活文娱
+                            <img src="../icon/下拉箭头.svg" style="width: 12px; height: 12px; margin-left: 4px;" alt="下拉">
+                        </a>
+                        <div class="subcategory-menu shadow-dropdown">
+                            <a href="#" class="subcategory-item" data-category="life" data-subcategory="market">跳蚤市场</a>
+                            <a href="#" class="subcategory-item" data-category="life" data-subcategory="club">社团</a>
+                            <a href="#" class="subcategory-item" data-category="life" data-subcategory="other">其他</a>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Add event listeners to new category tags
+            addCategoryListeners();
+            currentCategory = 'all';
+        }
+
+        // Update action button based on tab
+        function updateActionButton(tab) {
+            const actionBtn = document.getElementById('actionBtn');
+            
+            if (tab === 'news') {
+                actionBtn.innerHTML = '<i class="fa fa-comment"></i> 资讯反馈';
+                actionBtn.className = 'action-btn btn-secondary';
+                actionBtn.href = '#'; // 资讯反馈功能
+            } else {
+                actionBtn.innerHTML = '<i class="fa fa-plus"></i> 发布新帖';
+                actionBtn.className = 'action-btn btn-primary';
+                actionBtn.href = 'create-post.html'; // 发帖页面
+            }
+        }
+
+        // Sort functionality
+        let currentSort = 'latest';
+        
+        function toggleSortDropdown(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const dropdown = event.currentTarget;
+            dropdown.classList.toggle('active');
+        }
+        
+        function changeSorting(event, sortType, sortText) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Update active sort option
+            document.querySelectorAll('.sort-dropdown-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update sort text
+            document.getElementById('sortText').textContent = sortText;
+            
+            // Close dropdown
+            document.querySelector('.sort-dropdown').classList.remove('active');
+            
+            // Apply sorting
+            currentSort = sortType;
+            loadContent(currentTab, currentCategory);
+            
+            console.log(`Sorting by: ${sortType}`);
+        }
+
+        // Toggle dropdown function
+        function toggleDropdown(event, category) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Close all other dropdowns
+            document.querySelectorAll('.category-dropdown').forEach(dropdown => {
+                if (dropdown !== event.currentTarget) {
+                    dropdown.classList.remove('active');
+                }
+            });
+            
+            // Toggle current dropdown
+            const dropdown = event.currentTarget;
+            dropdown.classList.toggle('active');
+            
+            // Update active category when clicking dropdown
+            const categoryTag = dropdown.querySelector('.category-tag');
+            if (categoryTag) {
+                document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+                categoryTag.classList.add('active');
+                
+                currentCategory = category;
+                loadContent(currentTab, currentCategory);
+            }
+        }
+
+        // Close dropdowns when clicking outside - 但要避免干扰测试
+        document.addEventListener('click', function(e) {
+            // 如果是测试状态，不执行自动关闭
+            if (window.testMode) {
+                console.log('Test mode active - not auto-closing dropdowns');
+                return;
+            }
+            
+            if (!e.target.closest('.sort-dropdown')) {
+                const sortDropdown = document.querySelector('.sort-dropdown');
+                if (sortDropdown) {
+                    sortDropdown.classList.remove('active');
+                }
+            }
+            if (!e.target.closest('.category-dropdown')) {
+                document.querySelectorAll('.category-dropdown').forEach(dropdown => {
+                    dropdown.classList.remove('active');
+                });
+                console.log('Closed all dropdowns - clicked outside');
+            }
+        });
+
+        // Update sidebar title based on tab
+        function updateSidebarTitle(tab) {
+            const sidebarTitle = document.getElementById('sidebarTitle');
+            if (tab === 'news') {
+                sidebarTitle.textContent = '推荐资讯';
+            } else {
+                sidebarTitle.textContent = '推荐帖子';
+            }
+        }
+
+        // Add category listeners
+        function addCategoryListeners() {
+            console.log('Adding category listeners...');
+            
+            // 直接绑定事件委托，避免重复绑定问题
+            const categoryFilters = document.getElementById('categoryFilters');
+            if (!categoryFilters) {
+                console.error('Category filters container not found!');
+                return;
+            }
+            
+            // 移除旧的事件监听器
+            const newCategoryFilters = categoryFilters.cloneNode(true);
+            categoryFilters.parentNode.replaceChild(newCategoryFilters, categoryFilters);
+            
+            // 为新的容器添加事件委托
+            newCategoryFilters.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const clickedTag = e.target.closest('.category-tag');
+                if (!clickedTag) return;
+                
+                console.log('Category tag clicked:', clickedTag.dataset.category);
+                
+                const dropdown = clickedTag.closest('.category-dropdown');
+                
+                if (!dropdown) {
+                    // 非下拉分类（如"全部"）
+                    document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+                    clickedTag.classList.add('active');
+                    
+                    currentCategory = clickedTag.dataset.category;
+                    currentSubcategory = null; // 重置子分类
+                    loadContent(currentTab, currentCategory);
+                } else {
+                    // 下拉分类
+                    console.log('Dropdown category clicked, toggling dropdown...');
+                    
+                    // 关闭其他下拉菜单
+                    document.querySelectorAll('.category-dropdown').forEach(d => {
+                        if (d !== dropdown) {
+                            d.classList.remove('active');
+                            const menu = d.querySelector('.subcategory-menu');
+                            if (menu) menu.style.display = 'none';
+                        }
+                    });
+                    
+                    // 切换当前下拉菜单
+                    const wasActive = dropdown.classList.contains('active');
+                    const subcategoryMenu = dropdown.querySelector('.subcategory-menu');
+                    
+                    if (wasActive) {
+                        dropdown.classList.remove('active');
+                        if (subcategoryMenu) subcategoryMenu.style.display = 'none';
+                    } else {
+                        dropdown.classList.add('active');
+                        showDropdownMenu(dropdown);
+                    }
+                    
+                    console.log('Dropdown is now:', dropdown.classList.contains('active') ? 'open' : 'closed');
+                    
+                    // 更新活动分类
+                    const categoryName = clickedTag.dataset.category;
+                    if (categoryName) {
+                        document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+                        clickedTag.classList.add('active');
+                        
+                        currentCategory = categoryName;
+                        currentSubcategory = null; // 重置子分类
+                        loadContent(currentTab, currentCategory);
+                    }
+                }
+            });
+            
+            // 为子分类添加事件委托
+            newCategoryFilters.addEventListener('click', function(e) {
+                const subcategoryItem = e.target.closest('.subcategory-item');
+                if (!subcategoryItem) return;
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('Subcategory clicked:', subcategoryItem.dataset.subcategory);
+                
+                // 关闭所有下拉菜单
+                document.querySelectorAll('.category-dropdown').forEach(dropdown => {
+                    dropdown.classList.remove('active');
+                    const menu = dropdown.querySelector('.subcategory-menu');
+                    if (menu) menu.style.display = 'none';
+                });
+                
+                // 更新活动分类
+                const parentDropdown = subcategoryItem.closest('.category-dropdown');
+                if (parentDropdown) {
+                    const categoryTag = parentDropdown.querySelector('.category-tag');
+                    if (categoryTag) {
+                        document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+                        categoryTag.classList.add('active');
+                    }
+                }
+                
+                currentCategory = subcategoryItem.dataset.category;
+                currentSubcategory = subcategoryItem.dataset.subcategory;
+                
+                loadContent(currentTab, currentCategory, currentSubcategory);
+                console.log(`Filtering by ${currentCategory} - ${currentSubcategory}`);
+            });
+            
+            // 点击外部区域关闭下拉菜单
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.category-dropdown')) {
+                    document.querySelectorAll('.category-dropdown').forEach(dropdown => {
+                        dropdown.classList.remove('active');
+                        const menu = dropdown.querySelector('.subcategory-menu');
+                        if (menu) menu.style.display = 'none';
+                    });
+                }
+            });
+
+            
+            console.log('Category listeners added successfully');
+            
+            // 测试下拉菜单结构
+            const dropdowns = document.querySelectorAll('.category-dropdown');
+            console.log(`Found ${dropdowns.length} dropdown menus`);
+            dropdowns.forEach((dropdown, index) => {
+                const tag = dropdown.querySelector('.category-tag');
+                const menu = dropdown.querySelector('.subcategory-menu');
+                console.log(`Dropdown ${index + 1}: ${tag ? tag.textContent.trim() : 'no tag'}, menu: ${menu ? 'exists' : 'missing'}`);
+            });
+        }
+
+        // Load content based on tab and category
+        function loadContent(tab, category, subcategory = null) {
+            const contentList = document.getElementById('contentList');
+            
+            // Clear search when switching categories
+            const searchInput = document.getElementById('forumSearchInput');
+            searchInput.value = '';
+            
+            if (tab === 'news') {
+                contentList.innerHTML = getNewsContent(category);
+            } else {
+                contentList.innerHTML = getForumContent(category, subcategory);
+            }
+        }
+        
+        // Search functionality
+        function performSearch(searchTerm) {
+            const contentList = document.getElementById('contentList');
+            
+            if (!searchTerm) {
+                // If search is empty, reload current category content
+                loadContent(currentTab, currentCategory, currentSubcategory);
+                return;
+            }
+            
+            // Filter content based on search term
+            let filteredResults = [];
+            
+            if (currentTab === 'news') {
+                filteredResults = newsData.filter(item => 
+                    item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    item.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    item.category.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                displayFilteredNews(filteredResults, searchTerm);
+            } else {
+                filteredResults = forumPosts.filter(post => 
+                    post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    post.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    (post.subcategory && post.subcategory.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                    post.author.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                displayFilteredPosts(filteredResults, searchTerm);
+            }
+        }
+        
+        // Display filtered news results
+        function displayFilteredNews(results, searchTerm) {
+            const contentList = document.getElementById('contentList');
+            
+            if (results.length === 0) {
+                contentList.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">🔍</div>
+                        <div class="no-results-title">未找到相关资讯</div>
+                        <div class="no-results-desc">尝试使用其他关键词搜索："${searchTerm}"</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const searchResultsHeader = `
+                <div class="search-results-header">
+                    <h3>搜索结果 (${results.length})</h3>
+                    <span class="search-keyword">关键词: "${searchTerm}"</span>
+                </div>
+            `;
+            
+            const newsHtml = results.map(news => `
+                <article class="post-item news-post" onclick="openNewsDetail('${news.title}')">
+                    <div class="post-header">
+                        <div class="post-category-info">
+                            <span class="post-category category-${news.categoryClass}">${news.category}</span>
+                            <span class="post-time">${news.date}</span>
+                            <span class="post-views">👁️ ${news.views}</span>
+                        </div>
+                    </div>
+                    <h3 class="post-title">${highlightSearchTerm(news.title, searchTerm)}</h3>
+                    <p class="post-excerpt">${highlightSearchTerm(news.excerpt, searchTerm)}</p>
+                    <div class="post-engagement">
+                        <div class="engagement-stats">
+                            <span class="stat-item">👍 ${news.likes}</span>
+                            <span class="stat-item">💬 ${news.comments}</span>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+            
+            contentList.innerHTML = searchResultsHeader + newsHtml;
+        }
+        
+        // Display filtered forum posts results
+        function displayFilteredPosts(results, searchTerm) {
+            const contentList = document.getElementById('contentList');
+            
+            if (results.length === 0) {
+                contentList.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">🔍</div>
+                        <div class="no-results-title">未找到相关帖子</div>
+                        <div class="no-results-desc">尝试使用其他关键词搜索："${searchTerm}"</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const searchResultsHeader = `
+                <div class="search-results-header">
+                    <h3>搜索结果 (${results.length})</h3>
+                    <span class="search-keyword">关键词: "${searchTerm}"</span>
+                </div>
+            `;
+            
+            const postsHtml = results.map(post => `
+                <article class="post-item ${post.isVoting ? 'voting' : ''}" onclick="openPostDetail('${post.title}')">
+                    <div class="post-header">
+                        <div class="post-category-info">
+                            <span class="post-category category-${post.categoryClass}">${post.category}</span>
+                            ${post.subcategory ? `<span class="post-subcategory">${post.subcategory}</span>` : ''}
+                            ${post.isVoting ? '<span class="voting-badge">📊 投票</span>' : ''}
+                            <span class="post-time">${post.time}</span>
+                        </div>
+                        <div class="post-actions">
+                            <button class="action-btn report-btn" onclick="event.stopPropagation(); reportPost()" title="举报">
+                                <i class="fa fa-flag"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <h3 class="post-title">${highlightSearchTerm(post.title, searchTerm)}</h3>
+                    <p class="post-content">${highlightSearchTerm(post.content, searchTerm)}</p>
+                    <div class="post-footer">
+                        <div class="author-info" onclick="event.stopPropagation(); openUserProfile('${post.author}')">
+                            <img class="author-avatar" src="${post.avatar}" alt="${post.author}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                            <span class="author-name">${highlightSearchTerm(post.author, searchTerm)}</span>
+                        </div>
+                        <div class="post-stats">
+                            <span class="stat-item">👁️ ${post.views}</span>
+                            <span class="stat-item">👍 ${post.likes}</span>
+                            <span class="stat-item">💬 ${post.replies}</span>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+            
+            contentList.innerHTML = searchResultsHeader + postsHtml;
+        }
+        
+        // Highlight search term in text
+        function highlightSearchTerm(text, searchTerm) {
+            if (!searchTerm) return text;
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<mark style="background: #fff3cd; padding: 1px 2px; border-radius: 2px;">$1</mark>');
+        }
+
+        // Get news content
+        function getNewsContent(category) {
+            const newsData = {
+                all: [
+                    {
+                        id: 'news-vote-1',
+                        author: '活动组委会',
+                        avatar: '活',
+                        time: '30分钟前',
+                        category: ['公司大事'],
+                        title: '超能大赛初赛大众评审投票ing',
+                        content: '2024年度"超能大赛"初赛已圆满结束，现进入大众评审投票环节！本次初赛共有24个优秀项目入围，涵盖技术创新、业务优化、团队管理等多个领域。作为公司员工，您的每一票都至关重要...',
+                        stats: { views: 2156, comments: 78, likes: 145 },
+                        isVoting: true,
+                        isPinned: true,
+                        votingData: {
+                            title: '超能大赛初赛大众评审投票',
+                            description: '请为您心目中的最佳项目投票，每人最多可投3票',
+                            multiple: true,
+                            maxVotes: 3,
+                            endTime: '2024-01-20 23:59:59',
+                            totalVotes: 1247,
+                            options: [
+                                { id: 'v1', text: 'AI智能客服系统', votes: 234, percentage: 18.8 },
+                                { id: 'v2', text: '员工健康管理平台', votes: 198, percentage: 15.9 },
+                                { id: 'v3', text: '智慧办公环境优化', votes: 176, percentage: 14.1 },
+                                { id: 'v4', text: '数据可视化分析工具', votes: 165, percentage: 13.2 },
+                                { id: 'v5', text: '远程协作效率提升', votes: 154, percentage: 12.4 },
+                                { id: 'v6', text: '企业知识库建设', votes: 143, percentage: 11.5 },
+                                { id: 'v7', text: '绿色办公节能方案', votes: 132, percentage: 10.6 },
+                                { id: 'v8', text: '员工技能培训体系', votes: 45, percentage: 3.6 }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'news1',
+                        author: '企业发展部',
+                        avatar: '企',
+                        time: '1小时前',
+                        category: ['技术洞察'],
+                        title: 'AI技术在企业数字化转型中的应用与实践',
+                        content: '随着人工智能技术的快速发展，越来越多的企业开始将AI技术融入到日常业务运营中，推动企业数字化转型的进程...',
+                        stats: { views: 2845, comments: 23, likes: 128 }
+                    },
+                    {
+                        id: 'news2',
+                        author: '公司公告',
+                        avatar: '公',
+                        time: '2小时前',
+                        category: ['公司大事'],
+                        title: '公司获得年度最佳雇主称号',
+                        content: '经过严格的评审和员工满意度调查，我们公司荣获“2024年度最佳雇主”称号，这是对我们企业文化和员工关怀的高度认可...',
+                        stats: { views: 3200, comments: 45, likes: 198 }
+                    },
+                    {
+                        id: 'news3',
+                        author: '人事部',
+                        avatar: '人',
+                        time: '3小时前',
+                        category: ['文化长廊'],
+                        title: '2024年员工福利政策重大升级',
+                        content: '为了更好地关爱员工，提升员工幸福感，公司决定从2024年1月起全面升级员工福利政策，涵盖健康、休假、培训等多个方面...',
+                        stats: { views: 4100, comments: 89, likes: 256 }
+                    },
+                    {
+                        id: 'news4',
+                        author: '技术部',
+                        avatar: '技',
+                        time: '5小时前',
+                        category: ['技术洞察'],
+                        title: '新产品发布会圆满举行，获得行业高度认可',
+                        content: '昨日，我们公司的年度新产品发布会在上海成功举行，吸引了超过500名行业专家和媒体代表参加...',
+                        stats: { views: 2800, comments: 32, likes: 167 }
+                    },
+                    {
+                        id: 'news5',
+                        author: '行政部',
+                        avatar: '行',
+                        time: '1天前',
+                        category: ['文化长廊'],
+                        title: '绿色办公倡议活动正式启动',
+                        content: '为了维护地球环境，建设绿色办公环境，公司正式启动“绿色办公”倡议活动，倡导全体员工在日常办公中践行绿色理念...',
+                        stats: { views: 1500, comments: 18, likes: 92 }
+                    }
+                ],
+                company: [
+                    {
+                        id: 'news-vote-1',
+                        author: '活动组委会',
+                        avatar: '活',
+                        time: '30分钟前',
+                        category: ['公司大事'],
+                        title: '超能大赛初赛大众评审投票ing',
+                        content: '2024年度"超能大赛"初赛已圆满结束，现进入大众评审投票环节！本次初赛共有24个优秀项目入围，涵盖技术创新、业务优化、团队管理等多个领域。作为公司员工，您的每一票都至关重要...',
+                        stats: { views: 2156, comments: 78, likes: 145 },
+                        isVoting: true,
+                        isPinned: true,
+                        votingData: {
+                            title: '超能大赛初赛大众评审投票',
+                            description: '请为您心目中的最佳项目投票，每人最多可投3票',
+                            multiple: true,
+                            maxVotes: 3,
+                            endTime: '2024-01-20 23:59:59',
+                            totalVotes: 1247,
+                            options: [
+                                { id: 'v1', text: 'AI智能客服系统', votes: 234, percentage: 18.8 },
+                                { id: 'v2', text: '员工健康管理平台', votes: 198, percentage: 15.9 },
+                                { id: 'v3', text: '智慧办公环境优化', votes: 176, percentage: 14.1 },
+                                { id: 'v4', text: '数据可视化分析工具', votes: 165, percentage: 13.2 },
+                                { id: 'v5', text: '远程协作效率提升', votes: 154, percentage: 12.4 },
+                                { id: 'v6', text: '企业知识库建设', votes: 143, percentage: 11.5 },
+                                { id: 'v7', text: '绿色办公节能方案', votes: 132, percentage: 10.6 },
+                                { id: 'v8', text: '员工技能培训体系', votes: 45, percentage: 3.6 }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'news2',
+                        author: '公司公告',
+                        avatar: '公',
+                        time: '2小时前',
+                        category: ['公司大事'],
+                        title: '公司获得年度最佳雇主称号',
+                        content: '经过严格的评审和员工满意度调查，我们公司荣获"2024年度最佳雇主"称号，这是对我们企业文化和员工关怀的高度认可...',
+                        stats: { views: 3200, comments: 45, likes: 198 }
+                    },
+                    {
+                        id: 'news4',
+                        author: '技术部',
+                        avatar: '技',
+                        time: '5小时前',
+                        category: ['公司大事'],
+                        title: '公司参与行业标准制定，引领技术发展',
+                        content: '作为行业领先企业，我们积极参与多项行业技术标准的制定工作，为推动整个行业的技术进步贡献力量...',
+                        stats: { views: 1900, comments: 27, likes: 134 }
+                    }
+                ],
+                culture: [
+                    {
+                        id: 'news3',
+                        author: '人事部',
+                        avatar: '人',
+                        time: '3小时前',
+                        category: ['文化长廊'],
+                        title: '2024年员工福利政策重大升级',
+                        content: '为了更好地关爱员工，提升员工幸福感，公司决定从2024年1月起全面升级员工福利政策，涵盖健康、休假、培训等多个方面...',
+                        stats: { views: 4100, comments: 89, likes: 256 }
+                    },
+                    {
+                        id: 'news5',
+                        author: '行政部',
+                        avatar: '行',
+                        time: '1天前',
+                        category: ['文化长廊'],
+                        title: '绿色办公倡议活动正式启动',
+                        content: '为了维护地球环境，建设绿色办公环境，公司正式启动“绿色办公”倡议活动，倡导全体员工在日常办公中践行绿色理念...',
+                        stats: { views: 1500, comments: 18, likes: 92 }
+                    }
+                ],
+                tech: [
+                    {
+                        id: 'news1',
+                        author: '企业发展部',
+                        avatar: '企',
+                        time: '1小时前',
+                        category: ['技术洞察'],
+                        title: 'AI技术在企业数字化转型中的应用与实践',
+                        content: '随着人工智能技术的快速发展，越来越多的企业开始将AI技术融入到日常业务运营中，推动企业数字化转型的进程...',
+                        stats: { views: 2845, comments: 23, likes: 128 }
+                    }
+                ]
+            };
+
+            const data = newsData[category] || newsData.all;
+            
+            return data.map(item => `
+                <div class="content-card ${item.isVoting ? 'voting' : ''}" onclick="openPost('${item.id}')">
+                    <div class="card-header">
+                        <img class="author-avatar" src="${item.avatar}" alt="${item.author}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        <div class="card-meta">
+                            <div class="author-name">${item.author}</div>
+                            <div class="post-time">${item.time}</div>
+                        </div>
+                        <div class="category-badges">
+                            ${item.category.map(cat => `<span class="category-badge">${cat}</span>`).join('')}
+                            ${item.isVoting ? '<span class="voting-badge"><i>📊</i>投票</span>' : ''}
+                        </div>
+                    </div>
+                    <h3 class="card-title">${item.title}</h3>
+                    <p class="card-content">${item.content}</p>
+                    ${item.isVoting ? `
+                        <div class="voting-progress">
+                            <div class="voting-stats">
+                                <span>📊 ${item.votingData.totalVotes} 人已参与</span>
+                                <span class="voting-deadline">⏰ ${item.votingData.endTime.split(' ')[0]} 截止</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                    <div class="card-stats">
+                        <div class="stats-left">
+                            <div class="stat-item">
+                                <img src="../icon/浏览.png" style="width: 14px; height: 14px;" alt="浏览">
+                                <span>${item.stats.views}</span>
+                            </div>
+                            <div class="stat-item">
+                                <img src="../icon/评论.svg" style="width: 14px; height: 14px;" alt="评论">
+                                <span>${item.stats.comments}</span>
+                            </div>
+                            <div class="stat-item">
+                                <img src="../icon/点赞.png" style="width: 14px; height: 14px;" alt="点赞">
+                                <span>${item.stats.likes}</span>
+                            </div>
+                        </div>
+                        <button class="bookmark-btn" onclick="toggleBookmark(event, '${item.id}')">
+                            <img src="../icon/收藏.png" style="width: 14px; height: 14px;" alt="收藏">
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get forum content with subcategory support
+        function getForumContent(category, subcategory = null) {
+            const forumData = {
+                all: [
+                    {
+                        id: 'forum1',
+                        author: '李浩泽',
+                        avatar: '../头像/李浩泽-技术委员会.png',
+                        dept: '技术委员会',
+                        time: '3小时前',
+                        category: ['问答回响', '技术'],
+                        title: '关于差旅费报销新规定的疑问',
+                        content: '大家好，我想请教一下关于最近公司发布的差旅费报销新规定的几个问题：新规定中提到的“住宿标准按城市级别划分”，请问具体的标准是怎样的？...',
+                        stats: { views: 127, comments: 8, likes: 15 },
+                        pinned: true
+                    },
+                    {
+                        id: 'forum2',
+                        author: '张秋实',
+                        avatar: '../头像/张秋实-技术委员会.png',
+                        dept: '技术委员会',
+                        time: '2小时前',
+                        category: ['问答回响', 'IT'],
+                        title: '关于新系统部署的技术问题求助',
+                        content: '最近在部署新的微服务架构时遇到了一些技术难题，特别是在容器编排和服务发现方面，希望有经验的同事能给一些建议...',
+                        stats: { views: 128, comments: 15, likes: 23 }
+                    },
+                    {
+                        id: 'forum3',
+                        author: '李盛菲',
+                        avatar: '../头像/李盛菲-公有云.png',
+                        dept: '公有云',
+                        time: '4小时前',
+                        category: ['知识分享', '产品'],
+                        title: '产品设计中的用户体验优化实践分享',
+                        content: '在最近的产品迭代中，我们团队在用户体验优化方面积累了一些经验，包括用户调研、原型设计、A/B测试等环节的实践心得...',
+                        stats: { views: 89, comments: 8, likes: 32 },
+                        featured: true
+                    },
+                    {
+                        id: 'forum4',
+                        author: '高通',
+                        avatar: '../头像/高通-组织和人力资源.jpg',
+                        dept: '组织和人力资源',
+                        time: '6小时前',
+                        category: ['生活文娱'],
+                        title: '公司附近好吃的餐厅推荐',
+                        content: '在公司工作了半年，发现了几家非常不错的餐厅，想和大家分享一下。有川菜、粤菜、日料，性价比都很高...',
+                        stats: { views: 203, comments: 25, likes: 45 }
+                    },
+                    {
+                        id: 'forum5',
+                        author: '陈昱龙',
+                        avatar: '../头像/陈昱龙-政企事业部.jpg',
+                        dept: '研发部',
+                        time: '1天前',
+                        category: ['知识分享', '研发'],
+                        title: '年度预算编制流程优化建议',
+                        content: '经过一年的实践，我对年度预算编制流程有一些优化建议，希望能够帮助大家更高效地完成预算编制工作...',
+                        stats: { views: 42, comments: 6, likes: 12 }
+                    },
+                    {
+                        id: 'forum6',
+                        author: '韩博',
+                        avatar: '../头像/韩博-技术委员会.png',
+                        dept: '财务部',
+                        time: '2天前',
+                        category: ['问答回响', '财务'],
+                        title: '关于季度预算审批流程的咨询',
+                        content: '新入职不久，对公司的季度预算审批流程不太了解，特别是在预算变更和追加方面的规定...',
+                        stats: { views: 85, comments: 12, likes: 8 }
+                    },
+                    {
+                        id: 'forum7',
+                        author: '王凯辰',
+                        avatar: '../头像/王凯辰-销售大王.jpg',
+                        dept: 'IT部',
+                        time: '3天前',
+                        category: ['问答回响', 'IT'],
+                        title: '服务器维护期间的系统备份策略',
+                        content: '下周要对核心服务器进行维护升级，想请教大家关于系统备份和数据迁移的最佳实践...',
+                        stats: { views: 156, comments: 18, likes: 25 }
+                    },
+                    {
+                        id: 'forum8',
+                        author: '陆璐',
+                        avatar: '../头像/陆璐-管培生组.png',
+                        dept: 'HR',
+                        time: '4天前',
+                        category: ['问答回响', 'HR'],
+                        title: '员工培训计划制定的相关问题',
+                        content: '正在制定下季度的员工培训计划，想了解一下其他部门对培训内容和形式的建议...',
+                        stats: { views: 98, comments: 14, likes: 19 }
+                    }
+                ],
+                qa: [
+                    {
+                        id: 'forum1',
+                        author: '胡晓晓',
+                        avatar: '../头像/胡晓晓-技术研发部.jpg',
+                        dept: '技术研发部',
+                        time: '3小时前',
+                        category: ['问答回响', '财务'],
+                        title: '关于差旅费报销新规定的疑问',
+                        content: '大家好，我想请教一下关于最近公司发布的差旅费报销新规定的几个问题：新规定中提到的"住宿标准按城市级别划分"，请问具体的标准是怎样的？...',
+                        stats: { views: 127, comments: 8, likes: 15 },
+                        pinned: false
+                    },
+                    {
+                        id: 'forum2',
+                        author: '赵小萱',
+                        avatar: '../头像/赵小萱-技术委员会.png',
+                        dept: '技术委员会',
+                        time: '2小时前',
+                        category: ['问答回响', 'IT'],
+                        title: '关于新系统部署的技术问题求助',
+                        content: '最近在部署新的微服务架构时遇到了一些技术难题，特别是在容器编排和服务发现方面，希望有经验的同事能给一些建议...',
+                        stats: { views: 128, comments: 15, likes: 23 }
+                    },
+                    {
+                        id: 'forum6',
+                        author: '韩博',
+                        avatar: '../头像/韩博-技术委员会.png',
+                        dept: '财务部',
+                        time: '2天前',
+                        category: ['问答回响', '财务'],
+                        title: '关于季度预算审批流程的咨询',
+                        content: '新入职不久，对公司的季度预算审批流程不太了解，特别是在预算变更和追加方面的规定...',
+                        stats: { views: 85, comments: 12, likes: 8 }
+                    },
+                    {
+                        id: 'forum7',
+                        author: '王凯辰',
+                        avatar: '../头像/王凯辰-销售大王.jpg',
+                        dept: 'IT部',
+                        time: '3天前',
+                        category: ['问答回响', 'IT'],
+                        title: '服务器维护期间的系统备份策略',
+                        content: '下周要对核心服务器进行维护升级，想请教大家关于系统备份和数据迁移的最佳实践...',
+                        stats: { views: 156, comments: 18, likes: 25 }
+                    },
+                    {
+                        id: 'forum8',
+                        author: '陆璐',
+                        avatar: '../头像/陆璐-管培生组.png',
+                        dept: 'HR',
+                        time: '4天前',
+                        category: ['问答回响', 'HR'],
+                        title: '员工培训计划制定的相关问题',
+                        content: '正在制定下季度的员工培训计划，想了解一下其他部门对培训内容和形式的建议...',
+                        stats: { views: 98, comments: 14, likes: 19 }
+                    }
+                ],
+                knowledge: [
+                    {
+                        id: 'forum-vote-1',
+                        author: '陈昱龙',
+                        avatar: '../头像/陈昱龙-政企事业部.jpg',
+                        dept: '政企事业部',
+                        time: '1小时前',
+                        category: ['知识分享', '技术'],
+                        title: '你最希望下一期技术分享会讲解什么主题？',
+                        content: '大家好！下一期的技术分享会即将开始筹备，想征求一下大家的意见。请投票选择您最希望了解的技术主题，我们会根据投票结果来安排分享内容。每个人可以投1票，投票截止时间为本周五下午6点。',
+                        stats: { views: 234, comments: 18, likes: 32 },
+                        pinned: true,
+                        isVoting: true,
+                        votingData: {
+                            title: '下一期技术分享会主题选择',
+                            description: '请选择您最感兴趣的技术主题，每人限投1票',
+                            multiple: false,
+                            maxVotes: 1,
+                            endTime: '2024-01-12 18:00:00',
+                            totalVotes: 156,
+                            options: [
+                                { id: 'opt1', text: '微服务架构设计与实践', votes: 42, percentage: 26.9 },
+                                { id: 'opt2', text: '前端性能优化技巧', votes: 38, percentage: 24.4 },
+                                { id: 'opt3', text: 'AI大模型应用开发', votes: 35, percentage: 22.4 },
+                                { id: 'opt4', text: '云原生部署最佳实践', votes: 28, percentage: 17.9 },
+                                { id: 'opt5', text: '数据库性能调优', votes: 13, percentage: 8.3 }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'forum3',
+                        author: '韩博',
+                        avatar: '../头像/韩博-技术委员会.png',
+                        dept: '技术委员会',
+                        time: '4小时前',
+                        category: ['知识分享', '产品'],
+                        title: '产品设计中的用户体验优化实践分享',
+                        content: '在最近的产品迭代中，我们团队在用户体验优化方面积累了一些经验，包括用户调研、原型设计、A/B测试等环节的实践心得...',
+                        stats: { views: 89, comments: 8, likes: 32 },
+                        featured: true
+                    },
+                    {
+                        id: 'forum5',
+                        author: '陈昱龙',
+                        avatar: '../头像/陈昱龙-政企事业部.jpg',
+                        dept: '研发部',
+                        time: '1天前',
+                        category: ['知识分享', '研发'],
+                        title: '年度预算编制流程优化建议',
+                        content: '经过一年的实践，我对年度预算编制流程有一些优化建议，希望能够帮助大家更高效地完成预算编制工作...',
+                        stats: { views: 42, comments: 6, likes: 12 }
+                    }
+                ],
+                life: [
+                    {
+                        id: 'forum4',
+                        author: '陆璐',
+                        avatar: '../头像/陆璐-管培生组.png',
+                        dept: '管培生组',
+                        time: '6小时前',
+                        category: ['生活文娱'],
+                        title: '公司附近好吃的餐厅推荐',
+                        content: '在公司工作了半年，发现了几家非常不错的餐厅，想和大家分享一下。有川菜、粤菜、日料，性价比都很高...',
+                        stats: { views: 203, comments: 25, likes: 45 }
+                    }
+                ]
+            };
+
+            let data = forumData[category] || forumData.all;
+            
+            // Apply subcategory filter if specified
+            if (subcategory) {
+                data = data.filter(item => 
+                    item.category && item.category.includes(subcategory)
+                );
+                console.log(`Filtered by subcategory "${subcategory}":`, data.length, 'items');
+            }
+            
+            // Apply sorting
+            if (currentSort === 'popular') {
+                data = [...data].sort((a, b) => b.stats.likes - a.stats.likes);
+            } else if (currentSort === 'comments') {
+                data = [...data].sort((a, b) => b.stats.comments - a.stats.comments);
+            }
+            
+            return data.map(item => `
+                <div class="content-card ${item.pinned ? 'pinned' : ''} ${item.featured ? 'featured' : ''} ${item.isVoting ? 'voting' : ''}" onclick="openPost('${item.id}')">
+                    <div class="card-header">
+                        <img class="author-avatar" src="${item.avatar}" alt="${item.author}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        <div class="card-meta">
+                            <div class="author-name">${item.author}</div>
+                            <div class="post-time">${item.time}</div>
+                        </div>
+                        <div class="category-badges">
+                            ${item.category.map(cat => `<span class="category-badge">${cat}</span>`).join('')}
+                            ${item.pinned ? '<span class="pinned-badge">置顶</span>' : ''}
+                            ${item.featured ? '<span class="featured-badge">加精</span>' : ''}
+                            ${item.isVoting ? '<span class="voting-badge"><i>📊</i>投票</span>' : ''}
+                        </div>
+                    </div>
+                    <h3 class="card-title">${item.title}</h3>
+                    <p class="card-content">${item.content}</p>
+                    ${item.isVoting ? `
+                        <div class="voting-progress">
+                            <div class="voting-stats">
+                                <span>📊 ${item.votingData.totalVotes} 人已参与</span>
+                                <span class="voting-deadline">⏰ ${item.votingData.endTime.split(' ')[0]} 截止</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                    <div class="card-stats">
+                        <div class="stats-left">
+                            <div class="stat-item">
+                                <img src="../icon/浏览.png" style="width: 14px; height: 14px;" alt="浏览">
+                                <span>${item.stats.views}</span>
+                            </div>
+                            <div class="stat-item">
+                                <img src="../icon/评论.svg" style="width: 14px; height: 14px;" alt="评论">
+                                <span>${item.stats.comments}</span>
+                            </div>
+                            <div class="stat-item">
+                                <img src="../icon/点赞.png" style="width: 14px; height: 14px;" alt="点赞">
+                                <span>${item.stats.likes}</span>
+                            </div>
+                        </div>
+                        <button class="bookmark-btn" onclick="toggleBookmark(event, '${item.id}')">
+                            <img src="../icon/收藏.png" style="width: 14px; height: 14px;" alt="收藏">
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Functions for dropdown menu navigation
+        function switchToForum(category) {
+            switchTab('forum');
+            
+            // Update category selection
+            setTimeout(() => {
+                document.querySelectorAll('.category-tag').forEach(tag => {
+                    tag.classList.remove('active');
+                    if (tag.dataset.category === category) {
+                        tag.classList.add('active');
+                        currentCategory = category;
+                        loadContent('forum', category);
+                    }
+                });
+            }, 100);
+        }
+
+        function switchToNews(category) {
+            switchTab('news');
+            
+            // Update category selection
+            setTimeout(() => {
+                document.querySelectorAll('.category-tag').forEach(tag => {
+                    tag.classList.remove('active');
+                    if (tag.dataset.category === category) {
+                        tag.classList.add('active');
+                        currentCategory = category;
+                        loadContent('news', category);
+                    }
+                });
+            }, 100);
+        }
+
+        // Other functions
+        function openPost(id) {
+            console.log('Opening post:', id);
+            
+            // 根据当前模式跳转到不同的详情页
+            if (currentTab === 'news') {
+                // 资讯根据投票类型跳转到不同页面
+                const newsData = getNewsDataById(id);
+                if (newsData) {
+                    // 投票资讯跳转到 forum-news-vote-detail.html，普通资讯跳转到 news-detail.html
+                    const detailPage = newsData.isVoting ? 'forum-news-vote-detail.html' : 'news-detail.html';
+                    const url = `${detailPage}?id=${id}&title=${encodeURIComponent(newsData.title)}`;
+                    window.open(url, '_blank');
+                } else {
+                    console.error('News not found:', id);
+                }
+            } else {
+                // 论坛帖子根据投票类型跳转到不同页面
+                const forumData = getForumDataById(id);
+                if (forumData) {
+                    // 投票帖子跳转到 forum-vote-detail.html，普通帖子跳转到 forum-post-detail.html
+                    const detailPage = forumData.isVoting ? 'forum-vote-detail.html' : 'forum-post-detail.html';
+                    const url = `${detailPage}?id=${id}&title=${encodeURIComponent(forumData.title)}`;
+                    window.open(url, '_blank');
+                } else {
+                    console.error('Post not found:', id);
+                }
+            }
+        }
+        
+        // 获取资讯数据的辅助函数
+        function getNewsDataById(id) {
+            const newsData = {
+                all: [
+                    {
+                        id: 'news-vote-1',
+                        title: '超能大赛初赛大众评审投票ing',
+                        isVoting: true
+                    },
+                    {
+                        id: 'news1',
+                        title: 'AI技术在企业数字化转型中的应用与实践',
+                        isVoting: false
+                    },
+                    {
+                        id: 'news2',
+                        title: '公司获得年度最佳雇主称号',
+                        isVoting: false
+                    },
+                    {
+                        id: 'news3',
+                        title: '2024年员工福利政策重大升级',
+                        isVoting: false
+                    },
+                    {
+                        id: 'news4',
+                        title: '新产品发布会圆满举行，获得行业高度认可',
+                        isVoting: false
+                    },
+                    {
+                        id: 'news5',
+                        title: '绿色办公倡议活动正式启动',
+                        isVoting: false
+                    }
+                ]
+            };
+            return newsData.all.find(item => item.id === id);
+        }
+        
+        // 获取论坛数据的辅助函数
+        function getForumDataById(id) {
+            const forumData = {
+                all: [
+                    {
+                        id: 'forum-vote-1',
+                        title: '你最希望下一期技术分享会讲解什么主题？',
+                        isVoting: true
+                    },
+                    {
+                        id: 'forum1',
+                        title: '关于差旅费报销新规定的疑问',
+                        isVoting: false
+                    },
+                    {
+                        id: 'forum2',
+                        title: '关于新系统部署的技术问题求助',
+                        isVoting: false
+                    },
+                    {
+                        id: 'forum3',
+                        title: '产品设计中的用户体验优化实践分享',
+                        isVoting: false
+                    },
+                    {
+                        id: 'forum4',
+                        title: '公司附近好吃的餐厅推荐',
+                        isVoting: false
+                    },
+                    {
+                        id: 'forum5',
+                        title: '年度预算编制流程优化建议',
+                        isVoting: false
+                    }
+                ]
+            };
+            return forumData.all.find(item => item.id === id);
+        }
+
+        function toggleBookmark(event, id) {
+            event.stopPropagation();
+            const btn = event.target.closest('.bookmark-btn');
+            const img = btn.querySelector('img');
+            
+            if (btn.classList.contains('bookmarked')) {
+                btn.classList.remove('bookmarked');
+                btn.style.color = '';
+                img.style.opacity = '0.7';
+            } else {
+                btn.classList.add('bookmarked');
+                btn.style.color = '#E60012';
+                img.style.opacity = '1';
+            }
+        }
+
+        // Pagination functions
+        let currentPage = 2;
+        const totalPages = 10;
+
+        function changePage(page) {
+            currentPage = page;
+            
+            // Update active page button
+            document.querySelectorAll('.page-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Find and activate the clicked page button
+            const pageButtons = document.querySelectorAll('.page-btn');
+            pageButtons.forEach(btn => {
+                if (btn.textContent == page) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Load content for the selected page
+            loadContent(currentTab, currentCategory, page);
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                changePage(currentPage + 1);
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                changePage(currentPage - 1);
+            }
+        }
+
+        // 测试下拉菜单功能
+        function testDropdownFunction() {
+            console.log('=== 测试下拉菜单功能 ===');
+            const dropdowns = document.querySelectorAll('.category-dropdown');
+            console.log('Found dropdowns:', dropdowns.length);
+            
+            dropdowns.forEach((dropdown, index) => {
+                const tag = dropdown.querySelector('.category-tag');
+                const menu = dropdown.querySelector('.subcategory-menu');
+                console.log(`Dropdown ${index}:`, {
+                    tag: tag ? tag.textContent.trim() : 'not found',
+                    menu: menu ? 'exists' : 'not found',
+                    hasActiveClass: dropdown.classList.contains('active')
+                });
+                
+                // 强制显示一个下拉菜单用于测试
+                if (index === 0 && menu) {
+                    console.log('Making first dropdown visible for testing...');
+                    dropdown.classList.add('active');
+                    menu.classList.add('debug-visible');
+                    setTimeout(() => {
+                        dropdown.classList.remove('active');
+                        menu.classList.remove('debug-visible');
+                    }, 3000);
+                }
+            });
+        }
+        
+        // 显示下拉菜单的函数
+        function showDropdownMenu(dropdown) {
+            if (!dropdown) return;
+            
+            const menu = dropdown.querySelector('.subcategory-menu');
+            const tag = dropdown.querySelector('.category-tag');
+            
+            if (!menu || !tag) return;
+            
+            // 获取按钮位置
+            const tagRect = tag.getBoundingClientRect();
+            
+            // 设置菜单位置（fixed定位，相对于视窗）
+            menu.style.position = 'fixed';
+            menu.style.top = (tagRect.bottom + 5) + 'px';
+            menu.style.left = tagRect.left + 'px';
+            menu.style.display = 'block';
+            
+            console.log('显示下拉菜单在位置:', {
+                top: tagRect.bottom + 5,
+                left: tagRect.left
+            });
+        }
+        
+        // 手动测试函数
+        window.testDropdown = function() {
+            console.log('=== 测试修复后的下拉菜单 ===');
+            
+            const firstDropdown = document.querySelector('.category-dropdown');
+            if (firstDropdown) {
+                console.log('找到第一个下拉菜单:', firstDropdown);
+                
+                // 清除所有active状态
+                document.querySelectorAll('.category-dropdown').forEach(d => {
+                    d.classList.remove('active');
+                    const menu = d.querySelector('.subcategory-menu');
+                    if (menu) menu.style.display = 'none';
+                });
+                
+                // 激活当前下拉菜单
+                firstDropdown.classList.add('active');
+                showDropdownMenu(firstDropdown);
+                
+                console.log('下拉菜单已显示！检查是否可见...');
+                
+                const menu = firstDropdown.querySelector('.subcategory-menu');
+                if (menu) {
+                    const rect = menu.getBoundingClientRect();
+                    console.log('菜单位置信息:', rect);
+                    console.log('菜单样式:', {
+                        display: menu.style.display,
+                        position: menu.style.position,
+                        top: menu.style.top,
+                        left: menu.style.left
+                    });
+                }
+                
+                // 5秒后自动关闭
+                setTimeout(() => {
+                    firstDropdown.classList.remove('active');
+                    if (menu) menu.style.display = 'none';
+                    console.log('测试完成，下拉菜单已关闭');
+                }, 5000);
+                
+                return true;
+            } else {
+                console.log('未找到下拉菜单!');
+                return false;
+            }
+        }
+        
+        // 测试子分类匹配的函数
+        window.testSubcategoryMatch = function() {
+            console.log('=== 子分类匹配测试 ===');
+            
+            // 获取所有子分类项
+            const subcategoryItems = document.querySelectorAll('.subcategory-item');
+            console.log('找到子分类项:', subcategoryItems.length);
+            
+            subcategoryItems.forEach((item, index) => {
+                const category = item.dataset.category;
+                const subcategory = item.dataset.subcategory;
+                console.log(`${index + 1}. ${item.textContent.trim()}: category="${category}", subcategory="${subcategory}"`);
+            });
+            
+            // 测试数据匹配
+            console.log('\n=== 测试数据匹配 ===');
+            const testData = [
+                { category: ['问答回响', '财务'], title: '财务相关帖子' },
+                { category: ['问答回响', 'IT'], title: 'IT相关帖子' },
+                { category: ['知识分享', '研发'], title: '研发知识帖子' },
+                { category: ['知识分享', '产品'], title: '产品知识帖子' }
+            ];
+            
+            ['财务', 'IT', '研发', '产品'].forEach(subcategory => {
+                const matchedItems = testData.filter(item => 
+                    item.category && item.category.includes(subcategory)
+                );
+                console.log(`子分类"${subcategory}"匹配到 ${matchedItems.length} 个项目:`, matchedItems.map(item => item.title));
+            });
+        }
+        
+        // 新的综合调试函数
+        window.debugAll = function() {
+            console.log('=== 综合调试信息 ===');
+            
+            // 1. 基本状态
+            console.log('1. 当前状态:', {
+                tab: currentTab,
+                category: currentCategory,
+                subcategory: currentSubcategory
+            });
+            
+            // 2. 下拉菜单结构
+            const dropdowns = document.querySelectorAll('.category-dropdown');
+            console.log('2. 下拉菜单:', dropdowns.length, '个');
+            dropdowns.forEach((dropdown, i) => {
+                const tag = dropdown.querySelector('.category-tag');
+                const menu = dropdown.querySelector('.subcategory-menu');
+                const items = dropdown.querySelectorAll('.subcategory-item');
+                console.log(`  下拉菜单 ${i+1}:`, {
+                    name: tag?.textContent?.trim(),
+                    hasMenu: !!menu,
+                    itemCount: items.length,
+                    isActive: dropdown.classList.contains('active')
+                });
+                
+                if (items.length > 0) {
+                    items.forEach((item, j) => {
+                        console.log(`    子项 ${j+1}:`, {
+                            text: item.textContent?.trim(),
+                            category: item.dataset.category,
+                            subcategory: item.dataset.subcategory
+                        });
+                    });
+                }
+            });
+            
+            // 3. 测试数据过滤
+            console.log('3. 数据过滤测试:');
+            const allData = document.getElementById('contentList');
+            const cards = allData?.querySelectorAll('.content-card');
+            console.log(`  当前显示 ${cards?.length || 0} 个帖子`);
+            
+            // 4. 测试点击功能
+            console.log('4. 测试第一个下拉菜单...');
+            if (dropdowns.length > 0) {
+                const firstDropdown = dropdowns[0];
+                firstDropdown.classList.add('active');
+                showDropdownMenu(firstDropdown);
+                console.log('  第一个下拉菜单已激活');
+                
+                setTimeout(() => {
+                    firstDropdown.classList.remove('active');
+                    const menu = firstDropdown.querySelector('.subcategory-menu');
+                    if (menu) menu.style.display = 'none';
+                    console.log('  测试结束，菜单已关闭');
+                }, 3000);
+            }
+        }
+        
+        // 检查页面状态的函数
+        window.checkPageStatus = function() {
+            console.log('=== 页面状态检查 ===');
+            console.log('DOM loaded:', document.readyState);
+            console.log('Current tab:', window.currentTab || 'undefined');
+            console.log('Category filters:', !!document.getElementById('categoryFilters'));
+            console.log('Total category tags:', document.querySelectorAll('.category-tag').length);
+            console.log('Total dropdowns:', document.querySelectorAll('.category-dropdown').length);
+            console.log('Total subcategory items:', document.querySelectorAll('.subcategory-item').length);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing...');
+            addCategoryListeners();
+            loadContent(currentTab, currentCategory);
+            
+            // 移除自动测试功能，避免问答回响下拉框自动触发
+            // setTimeout(() => {
+            //     testDropdownFunction();
+            // }, 1000);
+            
+            // Add search functionality
+            const searchInput = document.getElementById('forumSearchInput');
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const searchTerm = this.value.trim();
+                    performSearch(searchTerm);
+                }, 300);
+            });
+            
+            // Add Enter key support for search
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const searchTerm = this.value.trim();
+                    performSearch(searchTerm);
+                }
+            });
+        });
+    </script>
+    
+
+</body>
+</html>

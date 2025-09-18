@@ -1,0 +1,3126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>投票帖详情 - 同事论坛</title>
+
+    <link rel="stylesheet" href="../components/header.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --ks-red: #E60012;
+            --ks-dark: #1A1A1A;
+            --ks-gray: #666666;
+            --ks-light-gray: #F5F5F5;
+            --ks-white: #FFFFFF;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --primary: #3B82F6;
+            --vote: #8B5CF6;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #DC2626;
+        }
+
+        /* 简约化投票统计卡片样式 */
+        .vote-stats-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #f0f0f0;
+            box-shadow: none;
+        }
+
+        .vote-stats-header .vote-stats-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333333;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .vote-status-info {
+            margin-bottom: 16px;
+        }
+
+        .vote-status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-radius: 6px;
+            background-color: #fafafa;
+        }
+
+        .vote-status-label {
+            font-size: 14px;
+            color: #666666;
+        }
+
+        .vote-status-value {
+            font-weight: 500;
+            color: #333333;
+        }
+
+        .vote-progress {
+            margin-bottom: 16px;
+        }
+
+        .vote-progress-header {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333333;
+            margin-bottom: 8px;
+        }
+
+        .vote-progress-bar-container {
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .vote-progress-bar {
+            background-color: #666666;
+            border-radius: 10px;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .vote-progress-text {
+            font-size: 12px;
+            color: #999999;
+        }
+
+        .top-option {
+            margin-bottom: 0;
+        }
+
+        .top-option-header {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333333;
+            margin-bottom: 8px;
+        }
+
+        .top-option-item {
+            background-color: #f8f8f8;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .top-option-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333333;
+            margin-bottom: 4px;
+        }
+
+        .top-option-progress-container {
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            height: 6px;
+            margin-bottom: 4px;
+            overflow: hidden;
+        }
+
+        .top-option-progress-bar {
+            background-color: #555555;
+            border-radius: 5px;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .top-option-stats {
+            font-size: 12px;
+            color: #999999;
+        }
+
+        .option-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rank-badge {
+            display: none; /* 默认隐藏，投票后显示 */
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 20px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .rank-badge.show {
+            display: inline-flex;
+        }
+
+        .rank-badge.rank-1 {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+        }
+
+        .rank-badge.rank-2 {
+            background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+            box-shadow: 0 2px 4px rgba(192, 192, 192, 0.3);
+        }
+
+        .rank-badge.rank-3 {
+            background: linear-gradient(135deg, #CD7F32, #B8860B);
+            box-shadow: 0 2px 4px rgba(205, 127, 50, 0.3);
+        }
+
+        .rank-badge.rank-other {
+            background: linear-gradient(135deg, #9CA3AF, #6B7280);
+        }
+
+        .option-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            flex: 1;
+        }
+
+        .vote-progress {
+            width: 100%;
+            height: 6px;
+            background: #F3F4F6;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .vote-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #F87171, #FCA5A5);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .vote-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .vote-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .vote-count {
+            font-size: 13px;
+            color: var(--ks-gray);
+            font-weight: 500;
+        }
+
+        .vote-percentage {
+            font-size: 13px;
+            color: #F87171;
+            font-weight: 600;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .option-progress {
+            position: relative;
+            background: #f5f5f5;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        /* Voting Styles */
+        .voting-section {
+            margin: 30px 0;
+        }
+
+        .voting-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .voting-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .voting-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #E60012 0%, #ff6b8a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .voting-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 4px 0;
+        }
+
+        .voting-description {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+
+        .voting-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .voting-stats {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .voting-status {
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .voting-status.active {
+            background: #e8f5e8;
+            color: #2d8a2f;
+        }
+
+        .voting-options {
+            margin-bottom: 24px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .option-item:hover {
+            border-color: #E60012;
+            background: rgba(230, 0, 18, 0.02);
+            z-index: 1000;
+            position: relative;
+        }
+
+        .option-item.selected {
+            border-color: #E60012;
+            background: rgba(230, 0, 18, 0.05);
+        }
+
+        .option-checkbox {
+            margin-right: 16px;
+        }
+
+        .option-checkbox input[type="radio"] {
+            display: none;
+        }
+
+        .option-checkbox label {
+            display: block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .option-checkbox input[type="radio"]:checked + label {
+            background: #E60012;
+            border-color: #E60012;
+        }
+
+        .option-checkbox input[type="radio"]:checked + label::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .option-content {
+            flex: 1;
+        }
+
+        .option-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .option-progress {
+            position: relative;
+            background: #f5f5f5;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #E60012, #ff6b8a);
+            border-radius: 3px;
+            width: var(--width);
+            transition: width 0.8s ease-out;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Tooltip Styles */
+        .option-item[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 8px;
+            padding: 12px 16px;
+            background: rgba(107, 114, 128, 0.95);
+            color: white;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.4;
+            width: 280px;
+            text-align: left;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: fadeInUp 0.3s ease;
+            pointer-events: none;
+        }
+
+        .option-item[data-tooltip]:hover::before {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 2px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid rgba(107, 114, 128, 0.95);
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .voting-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .vote-submit-btn {
+            background: #E60012;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        /* 参与进度条样式 */
+        .participation-progress {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 16px 0;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .progress-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .progress-percentage {
+            font-size: 16px;
+            font-weight: 700;
+            color: #E60012;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background-color: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #E60012 0%, #ff3344 100%);
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-info {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .progress-info strong {
+            color: #E60012;
+            font-size: 16px;
+        }
+        
+        /* 投票排名样式 */
+        .voting-rankings {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 16px 0;
+            border-left: 4px solid #E60012;
+        }
+        
+        .rankings-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .rankings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background-color: #fff;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .ranking-item:hover {
+            background-color: #f5f5f5;
+            transform: translateX(2px);
+        }
+        
+        .ranking-item.user-selected {
+            background-color: #fff0f0;
+            border: 1px solid #ffcccc;
+            font-weight: 500;
+        }
+        
+        .rank-number {
+            font-size: 18px;
+            font-weight: 700;
+            margin-right: 12px;
+            color: #666;
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        /* 前三名特殊样式 */
+        .ranking-item:nth-child(1) .rank-number {
+            color: #FFD700;
+        }
+        
+        .ranking-item:nth-child(2) .rank-number {
+            color: #C0C0C0;
+        }
+        
+        .ranking-item:nth-child(3) .rank-number {
+            color: #CD7F32;
+        }
+        
+        .rank-content {
+            flex: 1;
+        }
+        
+        .rank-text {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .rank-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .rank-votes {
+            font-weight: 500;
+        }
+        
+        .rank-percentage {
+            color: #999;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .voting-rankings {
+                padding: 12px 16px;
+            }
+            
+            .rankings-title {
+                font-size: 14px;
+            }
+            
+            .ranking-item {
+                padding: 6px 10px;
+            }
+            
+            .rank-number {
+                font-size: 16px;
+                margin-right: 8px;
+                min-width: 24px;
+            }
+            
+            .rank-text {
+                font-size: 13px;
+            }
+            
+            .rank-stats {
+                gap: 12px;
+                font-size: 11px;
+            }
+        }
+        
+        /* 选项上的排名显示样式 */
+        .option-rank {
+            display: inline-block;
+            font-size: 14px;
+            margin-right: 8px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background-color: #f0f2f5;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .option-rank.top-rank {
+            font-weight: 700;
+        }
+        
+        .option-rank.rank-1 {
+            background-color: #fff8e1;
+            color: #ffc107;
+        }
+        
+        .option-rank.rank-2 {
+            background-color: #f5f5f5;
+            color: #9e9e9e;
+        }
+        
+        .option-rank.rank-3 {
+            background-color: #fff3e0;
+            color: #ff9800;
+        }
+        
+        /* 选项文本样式调整 */
+        .option-text {
+            display: flex;
+            align-items: center;
+        }
+        
+        .option-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .option-text {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            flex: 1;
+        }
+        
+        .option-progress {
+            width: 100%;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #E60012 0%, #ff3344 100%);
+            border-radius: 4px;
+            width: var(--width);
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+            font-size: 12px;
+        }
+        
+        .progress-text span:first-child {
+            color: #666;
+        }
+        
+        .progress-text span:last-child {
+            color: #E60012;
+            font-weight: 600;
+        }
+
+        .vote-submit-btn {
+            transition: all 0.3s ease;
+        }
+
+        .vote-submit-btn:hover {
+            background: #d40011;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(230, 0, 18, 0.3);
+        }
+
+        .vote-submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .vote-limit-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .voting-card {
+                padding: 16px;
+            }
+            
+            .voting-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+            
+            .voting-info {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+            
+            .voting-stats {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .option-item {
+                padding: 12px;
+            }
+            
+            .voting-actions {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .vote-submit-btn {
+                width: 100%;
+            }
+        }
+
+        /* Add text-E60012 class for red color */
+        .text-E60012 {
+            color: #E60012;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+            color: var(--ks-dark);
+            background: #FAFAFA;
+        }
+
+        /* 统一：移除页面内联 Header 样式，使用 ../components/header.css */
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            height: 72px;
+        }
+
+        .logo {
+            height: 30px;
+            margin-right: 48px;
+        }
+
+        .logo img {
+            height: 100%;
+            width: auto;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 36px;
+            flex: 1;
+        }
+
+        .nav-item {
+            color: var(--ks-dark);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: var(--ks-red);
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--ks-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item.active::after {
+            width: 20px;
+        }
+
+        .nav-dropdown {
+            position: relative;
+        }
+
+        .nav-dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .dropdown-arrow {
+            width: 12px;
+            height: 12px;
+            transition: transform 0.3s;
+        }
+
+        .nav-dropdown:hover .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 140px;
+            background: var(--ks-white);
+            box-shadow: var(--shadow-lg);
+            border-radius: 12px;
+            padding: 8px 0;
+            margin-top: 4px;
+            z-index: 1001;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        /* Forum Dropdown Styles */
+        .forum-dropdown-menu {
+            min-width: 320px;
+            padding: 16px;
+        }
+
+        .nav-dropdown:hover .dropdown-menu {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 10px 20px;
+            color: var(--ks-dark);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(230, 0, 18, 0.05);
+            color: var(--ks-red);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 8px 40px 8px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            font-size: 14px;
+            width: 240px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--ks-red);
+            box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.1);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            background: url('../icon/搜索.png') no-repeat center;
+            background-size: contain;
+        }
+
+        /* 通知铃铛样式 */
+        .notification-container {
+            position: relative;
+            margin-right: 16px;
+        }
+
+        .notification-bell {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--ks-white);
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .notification-bell:hover {
+            background: #f9fafb;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--ks-red);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 320px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-dropdown);
+            border: 1px solid #e5e7eb;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .notification-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .notification-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            font-weight: 600;
+            color: var(--ks-dark);
+        }
+
+        .notification-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f9fafb;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background: #f9fafb;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-title {
+            font-size: 14px;
+            color: var(--ks-dark);
+            margin-bottom: 4px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        .notification-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #f3f4f6;
+            text-align: center;
+        }
+
+        .notification-footer button {
+            background: var(--ks-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .notification-footer button:hover {
+            background: #cc0010;
+        }
+
+        .user-avatar {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E60012, #764ba2 100%);
+            background-size: cover;
+            background-position: center;
+        }
+
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: white;
+            padding: 12px 0;
+            border-bottom: 1px solid #E5E5E5;
+        }
+
+        .breadcrumb-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: var(--ks-gray);
+        }
+
+        .breadcrumb-nav a {
+            color: var(--ks-gray);
+            text-decoration: none;
+        }
+
+        .breadcrumb-nav a:hover {
+            color: var(--ks-red);
+        }
+
+        .breadcrumb-separator {
+            margin: 0 8px;
+        }
+
+        /* Main Container */
+        .post-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 24px;
+        }
+
+        /* Post Main Content */
+        .post-main {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+
+        .post-header {
+            padding: 24px;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .post-badges {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-pinned {
+            background: #EF4444;
+            color: white;
+            border: 1px solid #EF4444;
+        }
+
+        .badge-featured {
+            background: #F59E0B;
+            color: white;
+            border: 1px solid #F59E0B;
+        }
+
+        .badge-vote {
+            background: #3B82F6;
+            color: white;
+            border: 1px solid #3B82F6;
+        }
+
+        .post-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--ks-dark);
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--ks-gray);
+            margin-bottom: 16px;
+        }
+
+        .post-meta-left {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .post-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: var(--ks-gray);
+        }
+
+        .post-categories {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .category-tag {
+            padding: 6px 12px;
+            background: #F3F4F6;
+            border-radius: 16px;
+            font-size: 13px;
+            color: var(--ks-gray);
+        }
+
+        .post-content {
+            padding: 24px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--ks-dark);
+        }
+
+        .post-content h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 24px 0 12px 0;
+            color: var(--ks-dark);
+        }
+
+        .post-content ul {
+            margin: 12px 0;
+            padding-left: 24px;
+        }
+
+        .post-content li {
+            margin-bottom: 8px;
+        }
+
+        /* Vote Section */
+        .vote-section {
+            margin: 24px;
+            padding: 24px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .vote-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+
+        .vote-header {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #E5E5E5;
+        }
+
+        .vote-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--ks-dark);
+            margin-bottom: 8px;
+        }
+
+        .vote-description {
+            color: var(--ks-gray);
+            font-size: 14px;
+        }
+
+        .vote-options {
+            margin-bottom: 24px;
+        }
+
+        .vote-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 50px;
+        }
+
+        .vote-option:hover {
+            border-color: #FFB3BA;
+            background: rgba(255, 179, 186, 0.1);
+            box-shadow: 0 2px 8px rgba(255, 179, 186, 0.2);
+        }
+        
+        .vote-option:hover .option-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .vote-option.selected {
+            border-color: #FFB3BA;
+            background: rgba(255, 179, 186, 0.15);
+        }
+
+        .vote-option input[type="radio"],
+        .vote-option input[type="checkbox"] {
+            margin-right: 12px;
+            accent-color: #3B82F6;
+        }
+
+        .vote-option-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .vote-option-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        .option-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        .vote-count {
+            font-size: 14px;
+            font-weight: 600;
+            color: #FF6B7A;
+        }
+
+        .rank-badge {
+            display: none; /* 默认隐藏，投票后显示 */
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 20px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .rank-badge.show {
+            display: inline-flex;
+        }
+
+        .rank-badge.rank-1 {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+        }
+
+        .rank-badge.rank-2 {
+            background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+            box-shadow: 0 2px 4px rgba(192, 192, 192, 0.3);
+        }
+
+        .rank-badge.rank-3 {
+            background: linear-gradient(135deg, #CD7F32, #B8860B);
+            box-shadow: 0 2px 4px rgba(205, 127, 50, 0.3);
+        }
+
+        .rank-badge.rank-other {
+            background: linear-gradient(135deg, #9CA3AF, #6B7280);
+        }
+
+        .vote-option-text {
+            font-size: 15px;
+            color: var(--ks-dark);
+            font-weight: 500;
+        }
+        
+        .option-tooltip {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+            margin-top: 4px;
+        }
+
+        .vote-progress {
+            width: 100%;
+            height: 4px;
+            background: #F0F0F0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .vote-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #F87171, #FCA5A5);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .vote-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .vote-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        .vote-count {
+            font-size: 13px;
+            color: var(--ks-gray);
+            font-weight: 500;
+        }
+
+        .vote-percentage {
+            font-size: 13px;
+            color: #F87171;
+            font-weight: 600;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .vote-result {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .vote-percentage {
+            font-weight: 600;
+            color: #3B82F6;
+        }
+
+        .vote-count {
+            color: var(--ks-gray);
+            font-size: 14px;
+        }
+
+
+        .vote-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .vote-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .vote-submit {
+            background: #3B82F6;
+            color: white;
+            border: none;
+        }
+
+        .vote-submit:hover {
+            background: #2563EB;
+        }
+
+        .vote-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .vote-view-results {
+            background: white;
+            color: #3B82F6;
+            border: 1px solid #3B82F6;
+        }
+
+        .vote-view-results:hover {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .vote-stats {
+            text-align: center;
+            padding: 16px;
+            background: white;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .vote-stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .vote-stats-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .vote-stats-label {
+            color: var(--ks-gray);
+        }
+
+        .vote-stats-value {
+            font-weight: 600;
+            color: var(--ks-dark);
+        }
+
+        .post-actions {
+            padding: 24px;
+            border-top: 1px solid #F0F0F0;
+            display: flex;
+            gap: 16px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: 1px solid #E5E5E5;
+            border-radius: 8px;
+            background: white;
+            color: var(--ks-gray);
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            border-color: var(--ks-red);
+            color: var(--ks-red);
+        }
+
+        .action-btn.liked {
+            background: var(--ks-red);
+            color: white;
+            border-color: var(--ks-red);
+        }
+
+        .action-btn.saved {
+            background: #F59E0B;
+            color: white;
+            border-color: #F59E0B;
+        }
+
+        /* Comments Section */
+        .comments-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-card);
+            margin-top: 24px;
+            overflow: hidden;
+        }
+
+        .comments-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #F0F0F0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comments-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--ks-dark);
+        }
+
+        .sort-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .sort-btn {
+            padding: 6px 12px;
+            border: none;
+            background: #F3F4F6;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sort-btn.active {
+            background: var(--ks-red);
+            color: white;
+        }
+
+        .comment-input {
+            padding: 20px 24px;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E60012, #764ba2);
+            flex-shrink: 0;
+        }
+
+        .comment-textarea {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #E5E5E5;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .comment-submit {
+            padding: 12px 24px;
+            background: var(--ks-red);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .comment-submit:hover {
+            background: #CC000F;
+        }
+
+        .comments-list {
+            padding: 20px 24px;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #F5F5F5;
+        }
+
+        .comment-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .comment-avatar-small {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E60012, #764ba2);
+            flex-shrink: 0;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: var(--ks-dark);
+        }
+
+        .comment-dept {
+            color: var(--ks-gray);
+            font-size: 13px;
+        }
+
+        .comment-time {
+            color: var(--ks-gray);
+            font-size: 13px;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .comment-action {
+            color: var(--ks-gray);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .comment-action:hover {
+            color: var(--ks-red);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
+            padding: 16px;
+            border: 1px solid #F8F9FA;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .sidebar-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-card-hover);
+        }
+
+        .sidebar-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ks-dark);
+            margin-bottom: 14px;
+        }
+
+        /* 字节风格卡片样式 */
+        .card-shadow {
+            box-shadow: var(--shadow-card);
+        }
+        
+        .hover-lift {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-card-hover);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            transition: all 0.2s ease;
+        }
+
+
+        /* Author Card */
+        .author-info {
+            text-align: center;
+        }
+
+        .author-avatar-large {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E60012, #764ba2);
+            margin: 0 auto 10px;
+        }
+
+        .author-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ks-dark);
+            margin-bottom: 3px;
+        }
+
+        .author-dept {
+            color: var(--ks-gray);
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .author-signature {
+            font-size: 12px;
+            color: var(--ks-gray);
+            font-style: italic;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .author-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .author-tag {
+            padding: 3px 8px;
+            background: #F3F4F6;
+            border-radius: 10px;
+            font-size: 11px;
+            color: var(--ks-gray);
+        }
+
+        .follow-btn {
+            width: 80%;
+            margin: 0 auto;
+            display: block;
+            padding: 8px;
+            background: var(--ks-red);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .follow-btn:hover {
+            background: #CC000F;
+            transform: translateY(-1px);
+        }
+
+
+        /* Vote Info Card */
+        .vote-info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .vote-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .vote-info-label {
+            font-size: 14px;
+            color: var(--ks-gray);
+            display: flex;
+            align-items: center;
+        }
+
+        .vote-info-label i {
+            margin-right: 6px;
+            width: 16px;
+            text-align: center;
+            color: #9CA3AF;
+        }
+
+        .vote-info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ks-dark);
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-left: 4px solid;
+            margin-bottom: 16px;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+
+        .vote-deadline {
+            color: #DC2626;
+        }
+
+        .vote-status {
+            color: #3B82F6;
+        }
+        
+        /* 投票信息卡片增强样式 */
+        @keyframes progressAnimation {
+            from { width: 0; }
+            to { width: var(--progress-width); }
+        }
+        
+        #participation-progress {
+            animation: progressAnimation 1s ease-out forwards;
+        }
+        
+        .bg-gradient-to-br {
+            background-image: linear-gradient(135deg, var(--tw-gradient-from), var(--tw-gradient-to));
+        }
+        
+        .from-blue-50 {
+            --tw-gradient-from: #EFF6FF;
+        }
+        
+        .to-indigo-50 {
+            --tw-gradient-to: #EEF2FF;
+        }
+        
+        .bg-blue-100 {
+            background-color: #DBEAFE;
+        }
+        
+        .text-blue-600 {
+            color: #2563EB;
+        }
+        
+        .text-blue-700 {
+            color: #1D4ED8;
+        }
+        
+        .text-blue-800 {
+            color: #1E40AF;
+        }
+        
+        .border-blue-100 {
+            border-color: #DBEAFE;
+        }
+        
+        .shadow-sm {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        
+        .bg-green-100 {
+            background-color: #DCFCE7;
+        }
+        
+        .text-green-600 {
+            color: #16A34A;
+        }
+        
+        .bg-blue-100 {
+            background-color: #DBEAFE;
+        }
+        
+        .text-blue-600 {
+            color: #2563EB;
+        }
+        
+        .bg-gray-100 {
+            background-color: #F3F4F6;
+        }
+        
+        .text-gray-600 {
+            color: #4B5563;
+        }
+        
+        .bg-red-100 {
+            background-color: #FEE2E2;
+        }
+        
+        .text-red-600 {
+            color: #DC2626;
+        }
+
+
+        /* Related Posts */
+        .related-post {
+            padding: 12px 0;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .related-post:last-child {
+            border-bottom: none;
+        }
+
+        .related-title {
+            font-size: 14px;
+            color: var(--ks-dark);
+            text-decoration: none;
+            line-height: 1.4;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .related-title:hover {
+            color: var(--ks-red);
+        }
+
+        .related-stats {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        /* Hot Topics */
+        .topic-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .topic-item:last-child {
+            border-bottom: none;
+        }
+
+        .topic-name {
+            font-size: 14px;
+            color: var(--ks-dark);
+            text-decoration: none;
+        }
+
+        .topic-name:hover {
+            color: var(--ks-red);
+        }
+
+        .topic-count {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        /* Participation Progress Bar */
+        .participation-progress {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #F0F0F0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #F3F4F6;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3B82F6, #60A5FA);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 统一静态 Header（与首页一致，路径已从子目录调整为 ../） -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="../01-金山 金山云logo-04.png" alt="金山云">
+            </div>
+            <nav class="nav-menu">
+                <a href="../index.html" class="nav-item">首页</a>
+                <div class="nav-dropdown">
+                    <div class="nav-dropdown-trigger">
+                        <a href="#" class="nav-item">AI工具</a>
+                        <img src="../icon/下拉箭头.svg" class="dropdown-arrow" alt="下拉">
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="../ai-tools.html" class="dropdown-item">AI工具库</a>
+                        <a href="../ai-practices.html" class="dropdown-item">AI实战</a>
+                        <a href="../ai-toolkits.html" class="dropdown-item">专题工具箱</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown forum-dropdown">
+                    <div class="nav-dropdown-trigger">
+                        <a href="./forum.html" class="nav-item active">同事论坛</a>
+                        <img src="../icon/下拉箭头.svg" class="dropdown-arrow" alt="下拉">
+                    </div>
+                    <div class="dropdown-menu forum-dropdown-menu">
+                        <div class="forum-dropdown-content">
+                            <div class="forum-dropdown-section">
+                                <h4 class="dropdown-section-title">论坛</h4>
+                                <div class="dropdown-items">
+                                    <a href="./forum.html?category=qa" class="dropdown-item">问答回响</a>
+                                    <a href="./forum.html?category=knowledge" class="dropdown-item">知识分享</a>
+                                    <a href="./forum.html?category=life" class="dropdown-item">生活文娱</a>
+                                </div>
+                            </div>
+                            <div class="forum-dropdown-section">
+                                <h4 class="dropdown-section-title">资讯</h4>
+                                <div class="dropdown-items">
+                                    <a href="./forum.html?tab=news&category=company" class="dropdown-item">公司动态</a>
+                                    <a href="./forum.html?tab=news&category=industry" class="dropdown-item">行业资讯</a>
+                                    <a href="./forum.html?tab=news&category=tech" class="dropdown-item">技术前沿</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#" class="nav-item">学习平台</a>
+                <a href="#" class="nav-item">企业活动</a>
+            </nav>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="搜索...">
+                    <button class="search-btn">
+                        <img src="../icon/搜索.png" alt="搜索" style="width: 16px; height: 16px;">
+                    </button>
+                </div>
+                <button class="notification-btn">
+                    <img src="../icon/通知.png" alt="通知">
+                    <div class="notification-badge"></div>
+                </button>
+                <div class="user-avatar">
+                    <div class="avatar-img" style="background-image: url('../头像/张秋实-技术委员会.png'); background-size: cover; background-position: center;"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="breadcrumb-container">
+            <nav class="breadcrumb-nav">
+                <a href="../index.html">首页</a>
+                <span class="breadcrumb-separator">></span>
+                <a href="forum.html">论坛</a>
+                <span class="breadcrumb-separator">></span>
+                <a href="forum.html?category=knowledge">知识分享</a>
+                <span class="breadcrumb-separator">></span>
+                <span>您最希望下一期技术分享会讲解什么主题？</span>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="post-container">
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="post-main">
+                <!-- Post Header -->
+                <header class="post-header">
+                    <div class="post-badges">
+                        <span class="badge badge-pinned">置顶</span>
+                        <span class="badge badge-vote">投票</span>
+                    </div>
+                    
+                    <h1 class="post-title">您最希望下一期技术分享会讲解什么主题？</h1>
+                    
+                    <div class="post-meta">
+                        <div class="post-meta-left">
+                            <span>2024年1月10日 15:30 发布</span>
+                        </div>
+                        <div class="post-stats">
+                            <span>1,234 浏览</span>
+                            <span>56 评论</span>
+                            <span>89 点赞</span>
+                        </div>
+                    </div>
+                    
+                    <div class="post-categories">
+                        <span class="category-tag">知识分享</span>
+                        <span class="category-tag">技术</span>
+                        <span class="category-tag">投票调研</span>
+                        <span class="category-tag">技术分享</span>
+                    </div>
+                </header>
+
+                <!-- Post Content -->
+                <div class="post-content">
+                    <p>大家好！下一期的技术分享会即将开始筹备，想征求一下大家的意见。请投票选择您最希望了解的技术主题，我们会根据投票结果来安排分享内容。</p>
+                    
+                    <p>本次投票将帮助我们了解大家的学习需求和兴趣方向，确保技术分享会的内容能够最大程度地满足团队的实际需要。</p>
+                </div>
+
+                <!-- Voting Section (only show for voting posts) -->
+                <div class="voting-section" id="voting-section" style="display: block;">
+                    <div class="voting-card">
+                        <div class="voting-header">
+                            <div class="voting-icon">
+                                <i style="font-size: 24px;">📊</i>
+                            </div>
+                            <div>
+                                <h3 class="voting-title">下一期技术分享会主题选择</h3>
+                                <p class="voting-description">请选择您最感兴趣的技术主题，每人限投1票</p>
+                            </div>
+                        </div>
+                         
+
+
+                        <!-- 投票排名显示区域 -->
+                        <div class="voting-rankings" style="display: none;">
+                            <h4 class="rankings-title">🏆 投票结果</h4>
+                            <div class="rankings-list" id="rankingsList">
+                                <!-- 排名将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+
+                        <div class="voting-options">
+                            <div class="option-item" data-option="opt1">
+                                <div class="option-checkbox">
+                                    <input type="radio" id="forum-opt1" name="vote-options" value="opt1">
+                                    <label for="forum-opt1"></label>
+                                </div>
+                                <div class="option-content">
+                                    <div class="option-header">
+                                        <div class="option-title">
+                                            <span class="rank-badge rank-1">1</span>
+                                            <div class="option-text">微服务架构设计与实践</div>
+                                        </div>
+                                        <span class="vote-count">62票</span>
+                                    </div>
+                                    <div class="vote-progress">
+                                        <div class="vote-progress-fill" style="width: 30%;"></div>
+                                    </div>
+                                </div>
+                                <div class="option-tooltip">深入探讨微服务架构的设计原则、拆分策略、服务治理等核心技术</div>
+                            </div>
+
+                            <div class="option-item" data-option="opt2">
+                                <div class="option-checkbox">
+                                    <input type="radio" id="forum-opt2" name="vote-options" value="opt2">
+                                    <label for="forum-opt2"></label>
+                                </div>
+                                <div class="option-content">
+                                    <div class="option-header">
+                                        <div class="option-title">
+                                            <span class="rank-badge rank-2">2</span>
+                                            <div class="option-text">前端性能优化技巧</div>
+                                        </div>
+                                        <span class="vote-count">58票</span>
+                                    </div>
+                                    <div class="vote-progress">
+                                        <div class="vote-progress-fill" style="width: 28%;"></div>
+                                    </div>
+                                </div>
+                                <div class="option-tooltip">包括代码分割、懒加载、CDN优化、打包优化等前端性能提升方案</div>
+                            </div>
+
+                            <div class="option-item" data-option="opt3">
+                                <div class="option-checkbox">
+                                    <input type="radio" id="forum-opt3" name="vote-options" value="opt3">
+                                    <label for="forum-opt3"></label>
+                                </div>
+                                <div class="option-content">
+                                    <div class="option-header">
+                                        <div class="option-title">
+                                            <span class="rank-badge rank-3">3</span>
+                                            <div class="option-text">数据库调优与监控</div>
+                                        </div>
+                                        <span class="vote-count">45票</span>
+                                    </div>
+                                    <div class="vote-progress">
+                                        <div class="vote-progress-fill" style="width: 22%;"></div>
+                                    </div>
+                                </div>
+                                <div class="option-tooltip">MySQL/Redis性能调优、SQL优化、数据库监控等实战技巧</div>
+                            </div>
+
+                            <div class="option-item" data-option="opt4">
+                                <div class="option-checkbox">
+                                    <input type="radio" id="forum-opt4" name="vote-options" value="opt4">
+                                    <label for="forum-opt4"></label>
+                                </div>
+                                <div class="option-content">
+                                    <div class="option-header">
+                                        <div class="option-title">
+                                            <span class="rank-badge rank-other">4</span>
+                                            <div class="option-text">云原生技术与Kubernetes</div>
+                                        </div>
+                                        <span class="vote-count">31票</span>
+                                    </div>
+                                    <div class="vote-progress">
+                                        <div class="vote-progress-fill" style="width: 15%;"></div>
+                                    </div>
+                                </div>
+                                <div class="option-tooltip">容器化、Kubernetes、服务网格等云原生技术全栈应用</div>
+                            </div>
+
+                            <div class="option-item" data-option="opt5">
+                                <div class="option-checkbox">
+                                    <input type="radio" id="forum-opt5" name="vote-options" value="opt5">
+                                    <label for="forum-opt5"></label>
+                                </div>
+                                <div class="option-content">
+                                    <div class="option-header">
+                                        <div class="option-title">
+                                            <span class="rank-badge rank-other">5</span>
+                                            <div class="option-text">网络安全与攻防技术</div>
+                                        </div>
+                                        <span class="vote-count">24票</span>
+                                    </div>
+                                    <div class="vote-progress">
+                                        <div class="vote-progress-fill" style="width: 12%;"></div>
+                                    </div>
+                                </div>
+                                <div class="option-tooltip">网络安全攻防、漏洞挖掘、安全代码审计等安全技术实践</div>
+                            </div>
+
+                            <div class="option-item" data-option="opt6">
+                                <div class="option-checkbox">
+                                    <input type="radio" id="forum-opt6" name="vote-options" value="opt6">
+                                    <label for="forum-opt6"></label>
+                                </div>
+                                <div class="option-content">
+                                    <div class="option-header">
+                                        <div class="option-title">
+                                            <span class="rank-badge rank-other">6</span>
+                                            <div class="option-text">DevOps与CI/CD实践</div>
+                                        </div>
+                                        <span class="vote-count">16票</span>
+                                    </div>
+                                    <div class="vote-progress">
+                                        <div class="vote-progress-fill" style="width: 8%;"></div>
+                                    </div>
+                                </div>
+                                <div class="option-tooltip">持续集成、持续部署、自动化测试等DevOps最佳实践</div>
+                            </div>
+                        </div>
+
+                        <div class="voting-actions">
+                            <button class="vote-submit-btn" onclick="submitForumVote()">提交投票</button>
+                            <span class="vote-limit-text">每人限投1票</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post Actions -->
+                <div class="post-actions">
+                    <button class="action-btn" onclick="toggleLike()">
+                        <img src="../icon/喜欢.png" style="width: 16px; height: 16px;" alt="点赞">
+                        <span>点赞 67</span>
+                    </button>
+                    <button class="action-btn" onclick="toggleSave()">
+                        <img src="../icon/收藏.png" style="width: 16px; height: 16px;" alt="收藏">
+                        <span>收藏</span>
+                    </button>
+                    <button class="action-btn" onclick="sharePost()">
+                        <i class="fas fa-share-alt"></i>
+                        <span>分享</span>
+                    </button>
+                    <button class="action-btn" onclick="reportPost()">
+                        <i class="fas fa-flag"></i>
+                        <span>举报</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="comments-section">
+                <div class="comments-header">
+                    <h3 class="comments-title">评论 (32)</h3>
+                    <div class="sort-options">
+                        <button class="sort-btn active">最新</button>
+                        <button class="sort-btn">最热</button>
+                        <button class="sort-btn">最早</button>
+                    </div>
+                </div>
+
+                <!-- Comment Input -->
+                <div class="comment-input">
+                    <div class="comment-form">
+                        <div class="comment-avatar"></div>
+                        <textarea class="comment-textarea" placeholder="写下你的评论..."></textarea>
+                        <button class="comment-submit">发表评论</button>
+                    </div>
+                </div>
+
+                <!-- Comments List -->
+                <div class="comments-list">
+                    <div class="comment-item">
+                        <div class="comment-avatar-small"></div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <span class="comment-author">李明</span>
+                                <span class="comment-dept">技术部</span>
+                                <span class="comment-time">1小时前</span>
+                            </div>
+                            <div class="comment-text">
+                                我投了微服务架构，希望能深入讲解一下分布式事务处理和服务治理的最佳实践。
+                            </div>
+                            <div class="comment-actions">
+                                <span class="comment-action">8 赞</span>
+                                <span class="comment-action">回复</span>
+                                <span class="comment-action">举报</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="comment-item">
+                        <div class="comment-avatar-small"></div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <span class="comment-author">王小红</span>
+                                <span class="comment-dept">前端组</span>
+                                <span class="comment-time">2小时前</span>
+                            </div>
+                            <div class="comment-text">
+                                前端性能优化真的很需要！特别是大型SPA应用的优化策略。
+                            </div>
+                            <div class="comment-actions">
+                                <span class="comment-action">12 赞</span>
+                                <span class="comment-action">回复</span>
+                                <span class="comment-action">举报</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Author Info -->
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">作者信息</h3>
+                <div class="author-info" onclick="window.location.href='user-profile.html'" style="cursor: pointer;">
+                    <img class="author-avatar-large" src="../头像/张秋实-技术委员会.png" alt="张秋实" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover;">
+                    <div class="author-name">张秋实</div>
+                    <div class="author-dept">技术部 - 部门经理</div>
+                    <div class="author-signature">"团队成长，技术先行"</div>
+                    <div class="author-tags">
+                        <span class="author-tag">管理</span>
+                        <span class="author-tag">技术规划</span>
+                    </div>
+                    <button class="follow-btn" onclick="event.stopPropagation();">关注</button>
+                </div>
+            </div>
+
+            <!-- 投票统计 (仅投票帖子显示) -->
+            <div class="sidebar-card" id="voting-stats-sidebar" style="display: block;">
+                <h3 class="sidebar-title">📊 投票统计</h3>
+                <div class="voting-stats-content">
+                    <!-- 倒计时 -->
+                    <div class="countdown-container">
+                        <div class="countdown-label">投票倒计时</div>
+                        <div class="countdown" id="countdown">
+                            <div class="time-block">
+                                <span class="time-number" id="days">4</span>
+                                <span class="time-label">天</span>
+                            </div>
+                            <div class="time-block">
+                                <span class="time-number" id="hours">23</span>
+                                <span class="time-label">小时</span>
+                            </div>
+                            <div class="time-block">
+                                <span class="time-number" id="minutes">30</span>
+                                <span class="time-label">分钟</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 参与进度条 -->
+                    <div class="participation-section">
+                        <div class="participation-header">
+                            <span class="participation-label">参与进度</span>
+                            <span class="participation-stats">206 / 1500</span>
+                        </div>
+                        <div class="participation-bar">
+                            <div class="participation-fill" id="participationProgressFill" style="width: 14%;"></div>
+                        </div>
+                        <div class="participation-percent">14%</div>
+                    </div>
+                    
+                    <!-- 投票状态 -->
+                    <div class="vote-status-section">
+                        <div class="status-row">
+                            <div class="status-badge status-active">进行中</div>
+                            <div class="vote-type-badge">单选</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <style>
+                /* 投票统计卡片样式 - 优化版 */
+                .voting-stats-content {
+                    padding: 16px;
+                }
+                
+                .participation-progress {
+                    margin-bottom: 20px;
+                }
+                
+                .progress-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 8px;
+                }
+                
+                .progress-header span {
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #333;
+                }
+                
+                .progress-percentage {
+                    font-size: 12px;
+                    color: #E60012;
+                    font-weight: 600;
+                }
+                
+                .progress-bar-container {
+                    position: relative;
+                    height: 8px;
+                    background-color: #e0e0e0;
+                    border-radius: 4px;
+                    overflow: hidden;
+                    margin-bottom: 4px;
+                }
+                
+                .progress-fill {
+                    height: 100%;
+                    background: linear-gradient(90deg, #E60012 0%, #ff6b8a 100%);
+                    border-radius: 4px;
+                    transition: width 0.6s ease-out;
+                }
+                
+                .progress-info {
+                    font-size: 11px;
+                    color: #999;
+                    text-align: right;
+                }
+                
+                /* 参与进度条样式 - 简约重设计 */
+                .participation-section {
+                    margin-bottom: 20px;
+                }
+                
+                .participation-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 12px;
+                }
+                
+                .participation-label {
+                    font-size: 15px;
+                    font-weight: 500;
+                    color: #333;
+                }
+                
+                .participation-stats {
+                    font-size: 14px;
+                    color: #666;
+                    font-weight: 500;
+                }
+                
+                .participation-bar {
+                    width: 100%;
+                    height: 6px;
+                    background-color: #f0f0f0;
+                    border-radius: 3px;
+                    overflow: hidden;
+                    margin-bottom: 8px;
+                }
+                
+                .participation-fill {
+                    height: 100%;
+                    background: linear-gradient(90deg, #4facfe, #00f2fe);
+                    border-radius: 3px;
+                    transition: width 0.8s ease;
+                }
+                
+                .participation-percent {
+                    text-align: center;
+                    font-size: 13px;
+                    color: #666;
+                    font-weight: 500;
+                }
+                
+                /* 投票状态样式 - 简约设计 */
+                .vote-status-section {
+                    margin-top: 16px;
+                }
+                
+                .status-row {
+                    display: flex;
+                    gap: 8px;
+                    justify-content: center;
+                }
+                
+                .status-badge {
+                    padding: 6px 12px;
+                    border-radius: 16px;
+                    font-size: 13px;
+                    font-weight: 500;
+                    border: 1px solid #e0e0e0;
+                }
+                
+                .status-active {
+                    background: #e8f5e8;
+                    color: #2d8a2f;
+                    border-color: #c3e6c3;
+                }
+                
+                .vote-type-badge {
+                    padding: 6px 12px;
+                    border-radius: 16px;
+                    font-size: 13px;
+                    font-weight: 500;
+                    background: #f0f4f8;
+                    color: #374151;
+                    border: 1px solid #d1d5db;
+                }
+                
+                .deadline-info {
+                    background-color: #fff8e1;
+                    padding: 12px;
+                    border-radius: 6px;
+                    margin-bottom: 16px;
+                    border-left: 4px solid #ffcc00;
+                }
+                
+                .deadline-label {
+                    font-size: 12px;
+                    color: #996600;
+                    margin-bottom: 2px;
+                }
+                
+                .deadline-date {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #cc6600;
+                }
+                
+                .countdown-container {
+                    margin-bottom: 20px;
+                    text-align: center;
+                }
+                
+                .countdown-label {
+                    font-size: 15px;
+                    font-weight: 600;
+                    color: #E60012;
+                    margin-bottom: 12px;
+                }
+                
+                .countdown {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 6px;
+                    background-color: #f8f9fa;
+                    padding: 12px;
+                    border-radius: 8px;
+                    border: 1px solid #e0e0e0;
+                }
+                
+                .time-block {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+                
+                .time-number {
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #333;
+                    background-color: #fff;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    min-width: 30px;
+                    text-align: center;
+                }
+                
+                .time-label {
+                    font-size: 11px;
+                    color: #666;
+                    margin-top: 2px;
+                }
+                
+                .time-separator {
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #666;
+                    margin: 0 2px;
+                }
+                
+                .voting-status-container {
+                    text-align: center;
+                }
+                
+                .status-badge {
+                    display: inline-block;
+                    padding: 4px 12px;
+                    border-radius: 16px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    margin-bottom: 4px;
+                }
+                
+                .status-badge.active {
+                    background-color: #e8f5e8;
+                    color: #2d8a2f;
+                }
+                
+                .status-badge.ended {
+                    background-color: #f5f5f5;
+                    color: #666;
+                }
+                
+                .status-text {
+                    font-size: 12px;
+                    color: #666;
+                }
+            </style>
+
+            <!-- Related Posts -->
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">相关推荐</h3>
+                <div class="related-post">
+                    <a href="#" class="related-title">上期技术分享会总结回顾</a>
+                    <div class="related-stats">856 浏览 • 23 评论</div>
+                </div>
+                <div class="related-post">
+                    <a href="#" class="related-title">2024年技术发展趋势预测</a>
+                    <div class="related-stats">1.2k 浏览 • 34 评论</div>
+                </div>
+                <div class="related-post">
+                    <a href="#" class="related-title">团队技术能力提升计划</a>
+                    <div class="related-stats">645 浏览 • 18 评论</div>
+                </div>
+            </div>
+
+            <!-- Hot Topics -->
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">热门话题</h3>
+                <div class="topic-item">
+                    <a href="#" class="topic-name">#技术分享会</a>
+                    <span class="topic-count">1.2k讨论</span>
+                </div>
+                <div class="topic-item">
+                    <a href="#" class="topic-name">#微服务架构</a>
+                    <span class="topic-count">856讨论</span>
+                </div>
+                <div class="topic-item">
+                    <a href="#" class="topic-name">#前端优化</a>
+                    <span class="topic-count">645讨论</span>
+                </div>
+                <div class="topic-item">
+                    <a href="#" class="topic-name">#数据库调优</a>
+                    <span class="topic-count">445讨论</span>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Forum Voting Functions
+        let selectedOption = '';
+        let hasVoted = false;
+        
+        function initializeForumVoting() {
+            // 检查用户是否已投票
+            checkUserVoteStatus();
+            
+            // Add click handlers for option items
+            document.querySelectorAll('.option-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (hasVoted) return;
+                    
+                    const radio = this.querySelector('input[type="radio"]');
+                    const optionId = this.dataset.option;
+                    
+                    // Clear previous selections
+                    document.querySelectorAll('.option-item').forEach(opt => {
+                        opt.classList.remove('selected');
+                        opt.querySelector('input[type="radio"]').checked = false;
+                    });
+                    
+                    // Select current option
+                    radio.checked = true;
+                    this.classList.add('selected');
+                    selectedOption = optionId;
+                    
+                    updateForumVoteButton();
+                });
+            });
+        }
+        
+        function updateForumVoteButton() {
+            const submitBtn = document.querySelector('.vote-submit-btn');
+            const limitText = document.querySelector('.vote-limit-text');
+            
+            if (hasVoted) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '已投票';
+                limitText.textContent = '投票已提交';
+            } else if (selectedOption === '') {
+                submitBtn.disabled = true;
+                limitText.textContent = '每人限投1票';
+            } else {
+                submitBtn.disabled = false;
+                limitText.textContent = '已选择1项，每人限投1票';
+            }
+        }
+        
+        function submitForumVote() {
+            if (hasVoted) {
+                alert('您已经投过票了！');
+                return;
+            }
+            
+            if (selectedOption === '') {
+                alert('请选择一个选项！');
+                return;
+            }
+            
+            // Get selected option text
+            const selectedItem = document.querySelector(`[data-option="${selectedOption}"] .option-text`);
+            const confirmText = `您选择了：${selectedItem.textContent}\n\n确认提交投票？`;
+            
+            if (confirm(confirmText)) {
+                // Simulate successful submission
+                alert('投票提交成功！感谢您的参与，我们会根据投票结果安排分享内容。');
+                
+                // Disable voting interface
+                hasVoted = true;
+                document.querySelectorAll('.option-item').forEach(item => {
+                    item.style.pointerEvents = 'none';
+                    item.style.opacity = '0.6';
+                });
+                
+                updateForumVoteButton();
+                
+                // Update vote results (in a real project, this would come from server)
+                updateVoteResults();
+            }
+        }
+        
+        // 检查用户是否已投票（实际项目中从后端获取）
+        function checkUserVoteStatus() {
+            // 这里应该是从后端获取用户投票状态的逻辑
+            // 暂时返回false表示未投票
+            hasVoted = false;
+            updateForumVoteButton();
+            
+            // 如果用户已经投过票，显示排名
+            if (hasVoted) {
+                calculateAndDisplayRankings();
+            }
+        }
+        
+        // 更新投票结果
+        // 计算并显示投票排名
+        function calculateAndDisplayRankings() {
+            // 直接调用新的updateVoteResults函数
+            updateVoteResults();
+        }
+        
+        
+        function updateVoteResults() {
+            // 显示所有排名徽章
+            document.querySelectorAll('.rank-badge').forEach(badge => {
+                badge.classList.add('show');
+            });
+            
+            // 获取所有选项的当前数据
+            const options = document.querySelectorAll('.option-item');
+            const voteData = [];
+            
+            options.forEach(option => {
+                const voteCountElement = option.querySelector('.vote-count');
+                let votes = parseInt(voteCountElement.textContent.replace('票', ''));
+                
+                // 如果是当前选择的选项，增加一票
+                if (option.dataset.option === selectedOption) {
+                    votes++;
+                    voteCountElement.textContent = `${votes}票`;
+                }
+                
+                voteData.push({
+                    option: option,
+                    votes: votes,
+                    element: voteCountElement
+                });
+            });
+            
+            // 计算总票数
+            const totalVotes = voteData.reduce((sum, item) => sum + item.votes, 0);
+            
+            // 更新进度条
+            voteData.forEach(item => {
+                const percentage = Math.round((item.votes / totalVotes) * 100);
+                const progressFill = item.option.querySelector('.vote-progress-fill');
+                
+                // 更新进度条宽度
+                progressFill.style.width = `${percentage}%`;
+            });
+            
+            // 按得票数排序并更新排名
+            voteData.sort((a, b) => b.votes - a.votes);
+            voteData.forEach((item, index) => {
+                const rankBadge = item.option.querySelector('.rank-badge');
+                const rank = index + 1;
+                
+                // 更新排名文字（不带#号）
+                rankBadge.textContent = rank.toString();
+                
+                // 更新排名样式
+                rankBadge.className = 'rank-badge show';
+                if (rank === 1) {
+                    rankBadge.classList.add('rank-1');
+                } else if (rank === 2) {
+                    rankBadge.classList.add('rank-2');
+                } else if (rank === 3) {
+                    rankBadge.classList.add('rank-3');
+                } else {
+                    rankBadge.classList.add('rank-other');
+                }
+            });
+            
+            // 更新参与进度条
+            updateParticipationProgress(totalVotes);
+        }
+        
+        // 更新参与进度条
+        function updateParticipationProgress(currentVotes) {
+            const targetVotes = 1500;
+            const progressPercentage = Math.min(Math.round((currentVotes / targetVotes) * 100), 100);
+            
+            const progressFill = document.getElementById('participationProgressFill');
+            const participationStats = document.querySelector('.participation-stats');
+            const participationPercent = document.querySelector('.participation-percent');
+            
+            // 更新进度条和显示信息
+            if (progressFill) progressFill.style.width = progressPercentage + '%';
+            if (participationStats) participationStats.textContent = `${currentVotes} / 1500`;
+            if (participationPercent) participationPercent.textContent = `${progressPercentage}%`;
+        }
+
+        // 点赞功能
+        function toggleLike() {
+            const btn = document.querySelector('.action-btn');
+            btn.classList.toggle('liked');
+            
+            const likeText = btn.querySelector('span');
+            if (btn.classList.contains('liked')) {
+                likeText.textContent = '已点赞 68';
+                btn.querySelector('i').classList.add('text-red');
+            } else {
+                likeText.textContent = '点赞 67';
+                btn.querySelector('i').classList.remove('text-red');
+            }
+        }
+
+        // 收藏功能
+        function toggleSave() {
+            const btn = document.querySelectorAll('.action-btn')[1];
+            btn.classList.toggle('saved');
+            
+            const saveText = btn.querySelector('span');
+            if (btn.classList.contains('saved')) {
+                saveText.textContent = '已收藏';
+                btn.querySelector('i').classList.add('text-red');
+            } else {
+                saveText.textContent = '收藏';
+                btn.querySelector('i').classList.remove('text-red');
+            }
+        }
+
+        // 分享功能
+        function sharePost() {
+            alert('分享功能开发中...');
+        }
+
+        // 举报功能
+        function reportPost() {
+            window.open('report-modal.html', '_blank', 'width=600,height=700,scrollbars=yes');
+        }
+
+        // Initialize voting when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeForumVoting();
+            startCountdown();
+        });
+        
+        // 倒计时功能实现
+        function startCountdown() {
+            // 设置截止日期（实际项目中应从服务器获取）
+            const deadline = new Date('2024-01-15T18:00:00');
+            
+            // 声明interval变量
+            let interval;
+            
+            // 更新倒计时显示
+            updateCountdown();
+            
+            // 每秒更新一次
+            interval = setInterval(() => {
+                updateCountdown();
+            }, 1000);
+            
+            function updateCountdown() {
+                const now = new Date();
+                const diff = deadline - now;
+                
+                // 计算剩余天、时、分、秒
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                // 更新DOM元素
+                document.getElementById('days').textContent = days.toString().padStart(2, '0');
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+                
+                // 更新状态文本
+                const statusText = document.querySelector('.status-text');
+                if (diff <= 0) {
+                    // 倒计时结束
+                    clearInterval(interval);
+                    document.getElementById('days').textContent = '00';
+                    document.getElementById('hours').textContent = '00';
+                    document.getElementById('minutes').textContent = '00';
+                    document.getElementById('seconds').textContent = '00';
+                    
+                    // 更新投票状态
+                    const statusBadge = document.querySelector('.status-badge');
+                    statusBadge.className = 'status-badge ended';
+                    statusBadge.textContent = '投票已结束';
+                    statusText.textContent = '感谢您的参与，投票结果已公布！';
+                } else {
+                    // 显示剩余时间
+                    if (days > 0) {
+                        statusText.textContent = `还剩 ${days} 天，抓紧时间投票吧！`;
+                    } else if (hours > 0) {
+                        statusText.textContent = `还剩 ${hours} 小时，抓紧时间投票吧！`;
+                    } else if (minutes > 0) {
+                        statusText.textContent = `还剩 ${minutes} 分钟，即将结束！`;
+                    } else {
+                        statusText.textContent = `还剩 ${seconds} 秒，最后时刻！`;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

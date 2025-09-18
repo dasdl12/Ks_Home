@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设置 - 金山云企业文化窗口</title>
+    <!-- 引入统一Header组件样式 -->
+    <link rel="stylesheet" href="components/header.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ks-red: #E60012;
+            --ks-dark: #1A1A1A;
+            --ks-gray: #666666;
+            --ks-light-gray: #F5F5F5;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #FAFAFA;
+            line-height: 1.6;
+            color: var(--ks-dark);
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #E0E0E0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 64px;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 0 24px;
+        }
+
+        .logo img {
+            height: 32px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-item {
+            color: var(--ks-dark);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--ks-red);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 8px 36px 8px 12px;
+            border: 1px solid #E0E0E0;
+            border-radius: 20px;
+            width: 200px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--ks-red);
+            width: 240px;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            background: url('icon/搜索.png') no-repeat center;
+            background-size: contain;
+        }
+
+        .notification-btn {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f8f8f8;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-btn:hover {
+            background: rgba(230, 0, 18, 0.1);
+        }
+
+        .notification-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--ks-red);
+            border-radius: 50%;
+        }
+
+        .user-avatar {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            padding: 8px;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+            border: 1px solid #F0F0F0;
+        }
+
+        .user-avatar:hover .user-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--ks-dark);
+        }
+
+        .dropdown-item:hover {
+            background: rgba(230, 0, 18, 0.05);
+            color: var(--ks-red);
+        }
+
+        .dropdown-item img {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .dropdown-item:hover img {
+            opacity: 1;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 32px;
+        }
+
+        /* Left Sidebar */
+        .settings-sidebar {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            height: fit-content;
+            position: sticky;
+            top: 104px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-title img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .settings-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--ks-dark);
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: rgba(230, 0, 18, 0.05);
+            color: var(--ks-red);
+        }
+
+        .menu-item img {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+        .menu-item:hover img,
+        .menu-item.active img {
+            opacity: 1;
+        }
+
+        /* Right Content Area */
+        .settings-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .content-header {
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .content-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .content-subtitle {
+            font-size: 14px;
+            color: var(--ks-gray);
+        }
+
+        .settings-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #F8F8F8;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .setting-desc {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        .setting-control {
+            margin-left: 16px;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #E0E0E0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--ks-red);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        /* Select Dropdown */
+        .setting-select {
+            padding: 8px 12px;
+            border: 1px solid #E0E0E0;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            min-width: 120px;
+        }
+
+        .setting-select:focus {
+            outline: none;
+            border-color: var(--ks-red);
+        }
+
+        /* Input Field */
+        .setting-input {
+            padding: 8px 12px;
+            border: 1px solid #E0E0E0;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 200px;
+        }
+
+        .setting-input:focus {
+            outline: none;
+            border-color: var(--ks-red);
+        }
+
+        /* Button */
+        .setting-btn {
+            padding: 8px 16px;
+            background: var(--ks-red);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .setting-btn:hover {
+            background: #c5000f;
+        }
+
+        .setting-btn.secondary {
+            background: #f8f8f8;
+            color: var(--ks-dark);
+        }
+
+        .setting-btn.secondary:hover {
+            background: #e8e8e8;
+        }
+
+        /* Profile Section */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .avatar-edit-btn {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 28px;
+            height: 28px;
+            background: var(--ks-red);
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-edit-btn img {
+            width: 12px;
+            height: 12px;
+            filter: brightness(0) invert(1);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .profile-meta {
+            font-size: 14px;
+            color: var(--ks-gray);
+            margin-bottom: 12px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Hidden content sections */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="01-金山 金山云logo-04.png" alt="金山云">
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">首页</a>
+                <a href="ai-tools.html" class="nav-item">AI工具</a>
+                <a href="论坛/forum.html" class="nav-item">同事论坛</a>
+                <a href="#" class="nav-item">学习平台</a>
+                <a href="#" class="nav-item">企业活动</a>
+            </nav>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="搜索...">
+                    <button class="search-btn"></button>
+                </div>
+                <button class="notification-btn" onclick="window.location.href='profile.html#notifications'">
+                    <img src="icon/通知.png" alt="通知">
+                    <div class="notification-badge"></div>
+                </button>
+                <div class="user-avatar">
+                    <div class="avatar-img" style="background-image: url('头像/谢其乐-技术委员会.png');"></div>
+                    <div class="user-dropdown">
+                        <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                            <img src="icon/用户.svg" alt="个人中心">
+                            <span>个人中心</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <img src="icon/目标.svg" alt="我的成就">
+                            <span>我的成就</span>
+                        </div>
+                        <div class="dropdown-item" onclick="window.location.href='settings.html'">
+                            <img src="icon/设置.png" alt="设置">
+                            <span>设置</span>
+                        </div>
+                        <div class="dropdown-item" onclick="logout()">
+                            <img src="icon/时间.svg" alt="退出">
+                            <span>退出登录</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Left Sidebar -->
+        <div class="settings-sidebar">
+            <div class="sidebar-title">
+                <img src="icon/设置.png" alt="设置">
+                设置
+            </div>
+            <div class="settings-menu">
+                <div class="menu-item active" onclick="showSection('profile')">
+                    <img src="icon/用户.svg" alt="个人资料">
+                    <span>个人资料</span>
+                </div>
+                <div class="menu-item" onclick="showSection('account')">
+                    <img src="icon/文件夹.svg" alt="账户设置">
+                    <span>账户设置</span>
+                </div>
+                <div class="menu-item" onclick="showSection('notifications')">
+                    <img src="icon/通知.png" alt="通知设置">
+                    <span>通知设置</span>
+                </div>
+                <div class="menu-item" onclick="showSection('privacy')">
+                    <img src="icon/目标.svg" alt="隐私设置">
+                    <span>隐私设置</span>
+                </div>
+                <div class="menu-item" onclick="showSection('appearance')">
+                    <img src="icon/切换.png" alt="外观设置">
+                    <span>外观设置</span>
+                </div>
+                <div class="menu-item" onclick="showSection('about')">
+                    <img src="icon/灯泡.svg" alt="关于">
+                    <span>关于</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Content Area -->
+        <div class="settings-content">
+            <!-- Profile Section -->
+            <div class="content-section active" id="profile">
+                <div class="content-header">
+                    <div class="content-title">个人资料</div>
+                    <div class="content-subtitle">管理您的个人信息和头像</div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="profile-avatar-large" style="background-image: url('cd4bd41dc215915e39fa6964ce208923.jpg');">
+                        <div class="avatar-edit-btn">
+                            <img src="icon/切换.png" alt="编辑">
+                        </div>
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name">谢其乐</div>
+                        <div class="profile-meta">高级前端专家 · 技术委员会</div>
+                        <div class="profile-actions">
+                            <button class="setting-btn">更换头像</button>
+                            <button class="setting-btn secondary">删除头像</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="section-title">
+                        <img src="icon/用户.svg" alt="基本信息">
+                        基本信息
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">姓名</div>
+                            <div class="setting-desc">您的真实姓名</div>
+                        </div>
+                        <div class="setting-control">
+                            <input type="text" class="setting-input" value="谢其乐">
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">邮箱</div>
+                            <div class="setting-desc">用于接收通知和重要信息</div>
+                        </div>
+                        <div class="setting-control">
+                            <input type="email" class="setting-input" value="zhangqiushi@kingsoft.com">
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">部门</div>
+                            <div class="setting-desc">您所在的部门</div>
+                        </div>
+                        <div class="setting-control">
+                            <select class="setting-select">
+                                <option value="tech">技术委员会</option>
+                                <option value="hr">人力资源部</option>
+                                <option value="sales">销售部</option>
+                                <option value="admin">行政部</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">职位</div>
+                            <div class="setting-desc">您的职位信息</div>
+                        </div>
+                        <div class="setting-control">
+                            <input type="text" class="setting-input" value="高级技术专家">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <button class="setting-btn">保存更改</button>
+                </div>
+            </div>
+
+            <!-- Account Section -->
+            <div class="content-section" id="account">
+                <div class="content-header">
+                    <div class="content-title">账户设置</div>
+                    <div class="content-subtitle">管理您的账户安全和登录信息</div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="section-title">
+                        <img src="icon/文件夹.svg" alt="安全设置">
+                        安全设置
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">修改密码</div>
+                            <div class="setting-desc">定期更换密码以保护账户安全</div>
+                        </div>
+                        <div class="setting-control">
+                            <button class="setting-btn">修改密码</button>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">两步验证</div>
+                            <div class="setting-desc">为您的账户添加额外的安全保护</div>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">登录设备管理</div>
+                            <div class="setting-desc">查看和管理已登录的设备</div>
+                        </div>
+                        <div class="setting-control">
+                            <button class="setting-btn secondary">管理设备</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Section -->
+            <div class="content-section" id="notifications">
+                <div class="content-header">
+                    <div class="content-title">通知设置</div>
+                    <div class="content-subtitle">管理您接收通知的方式和频率</div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="section-title">
+                        <img src="icon/通知.png" alt="通知偏好">
+                        通知偏好
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">邮件通知</div>
+                            <div class="setting-desc">接收重要更新和消息的邮件通知</div>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">浏览器通知</div>
+                            <div class="setting-desc">在浏览器中显示实时通知</div>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">论坛回复通知</div>
+                            <div class="setting-desc">当有人回复您的帖子时通知您</div>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">系统公告</div>
+                            <div class="setting-desc">接收系统维护和重要公告</div>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy Section -->
+            <div class="content-section" id="privacy">
+                <div class="content-header">
+                    <div class="content-title">隐私设置</div>
+                    <div class="content-subtitle">控制您的信息可见性和数据使用</div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="section-title">
+                        <img src="icon/目标.svg" alt="隐私控制">
+                        隐私控制
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">个人资料可见性</div>
+                            <div class="setting-desc">控制其他用户能看到您的哪些信息</div>
+                        </div>
+                        <div class="setting-control">
+                            <select class="setting-select">
+                                <option value="public">公开</option>
+                                <option value="colleagues">仅同事</option>
+                                <option value="private">私密</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">活动状态</div>
+                            <div class="setting-desc">显示您的在线状态</div>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">数据分析</div>
+                            <div class="setting-desc">允许系统分析您的使用数据以改善体验</div>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appearance Section -->
+            <div class="content-section" id="appearance">
+                <div class="content-header">
+                    <div class="content-title">外观设置</div>
+                    <div class="content-subtitle">个性化您的界面外观</div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="section-title">
+                        <img src="icon/切换.png" alt="主题设置">
+                        主题设置
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">主题模式</div>
+                            <div class="setting-desc">选择浅色或深色主题</div>
+                        </div>
+                        <div class="setting-control">
+                            <select class="setting-select">
+                                <option value="light">浅色模式</option>
+                                <option value="dark">深色模式</option>
+                                <option value="auto">跟随系统</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">字体大小</div>
+                            <div class="setting-desc">调整界面字体大小</div>
+                        </div>
+                        <div class="setting-control">
+                            <select class="setting-select">
+                                <option value="small">小</option>
+                                <option value="medium" selected>中</option>
+                                <option value="large">大</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">动画效果</div>
+                            <div class="setting-desc">启用界面动画和过渡效果</div>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="content-section" id="about">
+                <div class="content-header">
+                    <div class="content-title">关于</div>
+                    <div class="content-subtitle">系统信息和帮助</div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="section-title">
+                        <img src="icon/灯泡.svg" alt="系统信息">
+                        系统信息
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">版本信息</div>
+                            <div class="setting-desc">金山云企业文化窗口 v2.1.0</div>
+                        </div>
+                        <div class="setting-control">
+                            <button class="setting-btn secondary">检查更新</button>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">帮助文档</div>
+                            <div class="setting-desc">查看使用指南和常见问题</div>
+                        </div>
+                        <div class="setting-control">
+                            <button class="setting-btn secondary">查看帮助</button>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">反馈建议</div>
+                            <div class="setting-desc">向我们提供改进建议</div>
+                        </div>
+                        <div class="setting-control">
+                            <button class="setting-btn secondary">提交反馈</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked menu item
+            event.target.closest('.menu-item').classList.add('active');
+        }
+
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+
+        function logout() {
+            alert('正在退出登录...');
+        }
+    </script>
+</body>
+</html>

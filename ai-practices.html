@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI实战 - 金山云企业文化窗口</title>
+    <!-- 引入统一Header组件样式 -->
+    <link rel="stylesheet" href="components/header.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ks-red: #E60012;
+            --ks-dark: #1A1A1A;
+            --ks-gray: #666666;
+            --ks-light-gray: #F5F5F5;
+            --ks-white: #FFFFFF;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+            color: var(--ks-dark);
+            background: #FAFAFA;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background Decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -20%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(230, 0, 18, 0.03) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.02;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(230, 0, 18, 0.5) 35px, rgba(230, 0, 18, 0.5) 70px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(230, 0, 18, 0.3) 35px, rgba(230, 0, 18, 0.3) 70px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--ks-white);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            height: 72px;
+        }
+
+        .logo {
+            height: 32px;
+            margin-right: 48px;
+        }
+
+        .logo img {
+            height: 100%;
+            width: auto;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 36px;
+            flex: 1;
+        }
+
+        .nav-item {
+            color: var(--ks-dark);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: var(--ks-red);
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--ks-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item:hover::after {
+            width: 100%;
+        }
+
+        .nav-item.active {
+            color: var(--ks-red);
+        }
+
+        .nav-item.active::after {
+            width: 100%;
+        }
+
+        /* Dropdown Menu Styles */
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 140px;
+            box-shadow: var(--shadow-md);
+            border-radius: 8px;
+            padding: 8px 0;
+            z-index: 1001;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-dropdown:hover .dropdown-menu {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 8px 16px;
+            color: var(--ks-dark);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+            border-radius: 0;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(230, 0, 18, 0.05);
+            color: var(--ks-red);
+            padding-left: 20px;
+        }
+
+        .dropdown-item.active {
+            background: rgba(230, 0, 18, 0.1);
+            color: var(--ks-red);
+        }
+
+        .dropdown-item:hover::after {
+            display: none;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .notification-btn {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f8f8f8;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-btn:hover {
+            background: rgba(230, 0, 18, 0.1);
+        }
+
+        .notification-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--ks-red);
+            border-radius: 50%;
+        }
+
+        .header-search-box {
+            position: relative;
+        }
+
+        .header-search-input {
+            padding: 8px 40px 8px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            font-size: 14px;
+            width: 240px;
+            transition: all 0.3s ease;
+        }
+
+        .header-search-input:focus {
+            outline: none;
+            border-color: var(--ks-red);
+            box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.1);
+        }
+
+        .header-search-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+        }
+
+        /* User Menu Styles */
+        .user-menu {
+            position: relative;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .login-btn, .register-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn {
+            background: transparent;
+            color: var(--ks-dark);
+            border: 1px solid #E0E0E0;
+        }
+
+        .register-btn {
+            background: linear-gradient(135deg, var(--ks-red), #FF6B6B);
+            color: white;
+        }
+
+        .login-btn:hover {
+            border-color: var(--ks-red);
+            color: var(--ks-red);
+        }
+
+        .register-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(230, 0, 18, 0.3);
+        }
+
+        .user-profile-menu {
+            position: relative;
+        }
+
+        .user-avatar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+            position: relative;
+        }
+
+        .user-avatar:hover {
+            background-color: rgba(230, 0, 18, 0.05);
+        }
+
+        .user-avatar:hover .user-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-image: url('cd4bd41dc215915e39fa6964ce208923.jpg');
+            background-size: cover;
+            background-position: center;
+            transition: all 0.3s;
+        }
+
+        .user-avatar:hover .avatar-img {
+            box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.2);
+        }
+
+        .user-avatar img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-points {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            min-width: 18px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            padding: 8px;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+            border: 1px solid #F0F0F0;
+        }
+
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 16px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            transform: rotate(45deg);
+            border-left: 1px solid #F0F0F0;
+            border-top: 1px solid #F0F0F0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--ks-dark);
+        }
+
+        .dropdown-item:hover {
+            background: rgba(230, 0, 18, 0.05);
+            color: var(--ks-red);
+        }
+
+        .dropdown-item img {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .dropdown-item:hover img {
+            opacity: 1;
+        }
+
+        .dropdown-item span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #F0F0F0;
+            margin: 8px 0;
+        }
+
+        .user-info {
+            padding: 0 16px 8px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--ks-dark);
+        }
+
+        .user-level {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #E0E0E0;
+            margin: 8px 0;
+        }
+
+        .dropdown-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: var(--ks-dark);
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+
+        .dropdown-link:hover {
+            background-color: rgba(230, 0, 18, 0.05);
+        }
+
+        .dropdown-icon {
+            font-size: 16px;
+        }
+
+        /* Auth Modal Styles */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            padding: 32px;
+            position: relative;
+        }
+
+        .auth-modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--ks-gray);
+            cursor: pointer;
+        }
+
+        .auth-modal h2 {
+            text-align: center;
+            margin-bottom: 24px;
+            color: var(--ks-dark);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ks-dark);
+        }
+
+        .form-input {
+            padding: 12px 16px;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--ks-red);
+        }
+
+        .auth-submit {
+            background: linear-gradient(135deg, var(--ks-red), #FF6B6B);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .auth-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(230, 0, 18, 0.3);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--ks-gray);
+        }
+
+        .auth-switch a {
+            color: var(--ks-red);
+            text-decoration: none;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding: 24px 0;
+            background: linear-gradient(135deg, rgba(230, 0, 18, 0.05), rgba(255, 107, 107, 0.05));
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(230, 0, 18, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--ks-red), #FF6B6B);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--ks-gray);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .filter-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-title::before {
+            content: '';
+            width: 3px;
+            height: 16px;
+            background: linear-gradient(135deg, var(--ks-red), #FF6B6B);
+            border-radius: 2px;
+        }
+
+        .results-count {
+            font-size: 14px;
+            color: var(--ks-gray);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            background: var(--ks-light-gray);
+            border-radius: 20px;
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+
+        .filter-tab {
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: transparent;
+            border: none;
+            font-weight: 500;
+        }
+
+        .filter-tab.active {
+            background: white;
+            box-shadow: var(--shadow-sm);
+            color: var(--ks-red);
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            color: var(--ks-gray);
+            font-weight: 500;
+        }
+
+        .filter-select {
+            padding: 4px 10px;
+            border: 1px solid #E0E0E0;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 32px 8px 12px;
+            border: 1px solid #E0E0E0;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--ks-red);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            background: url('icon/搜索.png') no-repeat center;
+            background-size: contain;
+        }
+
+        /* Practices Grid */
+        .practices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .practice-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .practice-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, var(--ks-red), #FF6B6B);
+        }
+
+        .practice-card:hover {
+            background: linear-gradient(135deg, rgba(230, 0, 18, 0.02), rgba(255, 107, 107, 0.02));
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .practice-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .practice-author-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .practice-author-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .practice-author-info {
+            flex: 1;
+        }
+
+        .practice-author {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .practice-date {
+            font-size: 12px;
+            color: var(--ks-gray);
+            margin-top: 2px;
+        }
+
+        .practice-featured-badge {
+            padding: 3px 8px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .practice-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            color: var(--ks-dark);
+        }
+
+        .practice-excerpt {
+            font-size: 14px;
+            color: var(--ks-gray);
+            line-height: 1.6;
+            margin-bottom: 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        .practice-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .practice-tag {
+            padding: 3px 10px;
+            background: rgba(230, 0, 18, 0.1);
+            color: var(--ks-red);
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .practice-tag:hover {
+            background: rgba(230, 0, 18, 0.2);
+        }
+
+        .practice-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--ks-gray);
+            padding-top: 12px;
+            border-top: 1px solid #F0F0F0;
+        }
+
+        .practice-engagement {
+            display: flex;
+            gap: 16px;
+        }
+
+        .engagement-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .engagement-item img {
+            width: 12px;
+            height: 12px;
+        }
+
+        .practice-link {
+            color: var(--ks-red);
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .practice-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Loading State */
+        .loading-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .loading-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(230, 0, 18, 0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                left: 100%;
+            }
+        }
+
+        .loading-placeholder {
+            background: #E0E0E0;
+            border-radius: 4px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .loading-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+        }
+
+        .loading-title {
+            height: 20px;
+            margin-bottom: 12px;
+        }
+
+        .loading-content {
+            height: 60px;
+            margin-bottom: 16px;
+        }
+
+        .loading-tags {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .loading-tag {
+            height: 20px;
+            width: 60px;
+            border-radius: 10px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--ks-gray);
+        }
+
+        .empty-desc {
+            font-size: 14px;
+            color: var(--ks-gray);
+            margin-bottom: 24px;
+        }
+
+        .empty-action {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--ks-red), #FF6B6B);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .empty-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 0, 18, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--ks-dark);
+            color: white;
+            padding: 48px 0 24px;
+            margin-top: 80px;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 32px;
+        }
+
+        .footer-about h3 {
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .footer-about p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
+        }
+
+        .footer-links h4 {
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .practices-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-options {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+            
+            .header-search-input {
+                width: 160px;
+            }
+            
+            .header-search-input:focus {
+                width: 200px;
+            }
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- API服务模块 -->
+    <script src="js/api.js"></script>
+    
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="01-金山 金山云logo-04.png" alt="金山云">
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">首页</a>
+                <div class="nav-dropdown">
+                    <div class="nav-dropdown-trigger">
+                        <a href="#" class="nav-item active">AI工具</a>
+                        <img src="icon/下拉箭头.svg" class="dropdown-arrow" alt="下拉">
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="ai-tools.html" class="dropdown-item">AI工具库</a>
+                        <a href="ai-practices.html" class="dropdown-item active">AI实战</a>
+                        <a href="ai-toolkits.html" class="dropdown-item">专题工具箱</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown forum-dropdown">
+                    <div class="nav-dropdown-trigger">
+                        <a href="论坛/forum.html" class="nav-item">同事论坛</a>
+                        <img src="icon/下拉箭头.svg" class="dropdown-arrow" alt="下拉">
+                    </div>
+                    <div class="dropdown-menu forum-dropdown-menu">
+                        <div class="forum-dropdown-content">
+                            <div class="forum-dropdown-section">
+                                <h4 class="dropdown-section-title">论坛</h4>
+                                <div class="dropdown-items">
+                                    <a href="论坛/forum.html?category=qa" class="dropdown-item">问答回响</a>
+                                    <a href="论坛/forum.html?category=knowledge" class="dropdown-item">知识分享</a>
+                                    <a href="论坛/forum.html?category=life" class="dropdown-item">生活文娱</a>
+                                </div>
+                            </div>
+                            <div class="forum-dropdown-section">
+                                <h4 class="dropdown-section-title">资讯</h4>
+                                <div class="dropdown-items">
+                                    <a href="论坛/forum.html?tab=news&category=company" class="dropdown-item">公司动态</a>
+                                    <a href="论坛/forum.html?tab=news&category=industry" class="dropdown-item">行业资讯</a>
+                                    <a href="论坛/forum.html?tab=news&category=tech" class="dropdown-item">技术前沿</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#" class="nav-item">学习平台</a>
+                <a href="#" class="nav-item">企业活动</a>
+            </nav>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="搜索...">
+                    <button class="search-btn">
+                        <img src="icon/搜索.png" alt="搜索" style="width: 16px; height: 16px;">
+                    </button>
+                </div>
+                <div class="notification-btn">
+                    <img src="icon/通知.png" alt="通知">
+                    <div class="notification-badge"></div>
+                </div>
+                <div class="user-avatar">
+                    <div class="avatar-img" style="background-image: url('cd4bd41dc215915e39fa6964ce208923.jpg'); background-size: cover; background-position: center;"></div>
+                    <div class="user-dropdown">
+                        <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                            <img src="icon/用户.svg" alt="个人中心">
+                            <span>个人中心</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <img src="icon/目标.svg" alt="我的成就">
+                            <span>我的成就</span>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item">
+                            <img src="icon/文件夹.svg" alt="设置">
+                            <span>设置</span>
+                        </div>
+                        <div class="dropdown-item" onclick="logout()">
+                            <img src="icon/时间.svg" alt="退出">
+                            <span>退出登录</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <div class="page-title-icon"><img src="icon/奖杯.svg" style="width: 24px; height: 24px;" alt="奖杯"></div>
+                AI实战
+            </h1>
+            <p class="page-subtitle">从主平台论坛精选的高质量AI实战案例，学习同事们的实践经验</p>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-header">
+                <h3 class="filter-title">实战案例</h3>
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="搜索案例标题或内容..." id="searchInput" oninput="searchPractices()">
+                    <button class="search-btn"></button>
+                </div>
+            </div>
+            
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="switchFilter('all')">全部案例</button>
+                <button class="filter-tab" onclick="switchFilter('featured')">精选推荐</button>
+                <button class="filter-tab" onclick="switchFilter('popular')">热门讨论</button>
+                <button class="filter-tab" onclick="switchFilter('recent')">最新发布</button>
+            </div>
+        </div>
+
+        <!-- Practices Grid -->
+        <div class="practices-grid" id="practicesGrid">
+            <!-- Loading state will be shown initially -->
+        </div>
+
+        <!-- Empty State (hidden by default) -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-icon"><img src="icon/搜索.png" style="width: 64px; height: 64px; opacity: 0.3;" alt="搜索"></div>
+            <h3 class="empty-title">没有找到相关案例</h3>
+            <p class="empty-desc">尝试调整筛选条件或搜索关键词</p>
+            <button class="empty-action" onclick="resetFilters()">重置筛选条件</button>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="auth-modal" style="display: none;">
+        <div class="auth-modal-content">
+            <button class="auth-modal-close" onclick="closeAuthModal()">&times;</button>
+            
+            <div id="loginForm">
+                <h2>登录</h2>
+                <form class="auth-form" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">用户名或邮箱</label>
+                        <input type="text" class="form-input" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">密码</label>
+                        <input type="password" class="form-input" name="password" required>
+                    </div>
+                    <button type="submit" class="auth-submit">登录</button>
+                </form>
+                <div class="auth-switch">
+                    还没有账号？<a href="#" onclick="switchToRegister()">立即注册</a>
+                </div>
+            </div>
+            
+            <div id="registerForm" style="display: none;">
+                <h2>注册</h2>
+                <form class="auth-form" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label class="form-label">用户名</label>
+                        <input type="text" class="form-input" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">邮箱</label>
+                        <input type="email" class="form-input" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">密码</label>
+                        <input type="password" class="form-input" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">确认密码</label>
+                        <input type="password" class="form-input" name="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="auth-submit">注册</button>
+                </form>
+                <div class="auth-switch">
+                    已有账号？<a href="#" onclick="switchToLogin()">立即登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <h3>AI实战</h3>
+                    <p>汇聚企业内部AI应用的最佳实践案例，通过同事们的真实经验分享，助力AI技能提升和创新思维培养。</p>
+                </div>
+                <div class="footer-links">
+                    <h4>案例分类</h4>
+                    <ul>
+                        <li><a href="#">代码开发</a></li>
+                        <li><a href="#">办公效率</a></li>
+                        <li><a href="#">设计创意</a></li>
+                        <li><a href="#">数据分析</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>相关资源</h4>
+                    <ul>
+                        <li><a href="ai-tools.html">AI工具库</a></li>
+                        <li><a href="ai-toolkits.html">专题工具箱</a></li>
+                        <li><a href="论坛/forum.html">同事论坛</a></li>
+                        <li><a href="#">学习平台</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>参与贡献</h4>
+                    <ul>
+                        <li><a href="#">分享经验</a></li>
+                        <li><a href="#">案例投稿</a></li>
+                        <li><a href="#">问题反馈</a></li>
+                        <li><a href="index.html">返回主页</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 金山云AI实战. All Rights Reserved. | 分享实践经验，共同成长进步</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ========== API数据加载功能 ==========
+        
+        // 页面加载时初始化数据
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                await loadPracticesData();
+                console.log('实践案例数据加载完成');
+            } catch (error) {
+                console.error('数据加载失败，使用静态数据:', error);
+            }
+        });
+
+        // 加载实践案例数据
+        async function loadPracticesData() {
+            try {
+                const practices = await apiService.getPractices();
+                if (practices && practices.results) {
+                    updatePracticesData(practices.results);
+                }
+            } catch (error) {
+                console.error('实践案例数据加载失败:', error);
+            }
+        }
+
+        // 更新实践案例数据结构
+        function updatePracticesData(practices) {
+            bestPracticesData.length = 0; // 清空原有数据
+            
+            practices.forEach(practice => {
+                const formattedPractice = {
+                    id: practice.id,
+                    title: practice.title,
+                    excerpt: practice.content.substring(0, 200) + (practice.content.length > 200 ? '...' : ''),
+                    author: practice.author_name || practice.author,
+                    authorAvatar: practice.author_avatar || 'icon/用户.svg',
+                    authorDept: practice.author_department || '技术委员会',
+                    date: new Date(practice.created_at).toLocaleDateString('zh-CN'),
+                    readTime: Math.ceil(practice.content.length / 500) + '分钟阅读',
+                    views: practice.view_count || Math.floor(Math.random() * 1000) + 100,
+                    likes: practice.like_count || Math.floor(Math.random() * 50) + 10,
+                    category: practice.category || 'AI工具应用',
+                    tags: practice.tags || ['实践案例', 'AI工具'],
+                    difficulty: practice.difficulty || 'intermediate',
+                    content: practice.content,
+                    images: practice.images || []
+                };
+                
+                bestPracticesData.push(formattedPractice);
+            });
+            
+            // 重新渲染案例列表
+            renderPractices();
+        }
+
+        // ========== 原有功能代码 ==========
+        
+        // Best Practices Data - Extended with more cases
+        let bestPracticesData = [
+            {
+                id: 1,
+                title: '用Claude Code重构5年老项目：提升代码质量80%',
+                excerpt: '分享如何使用Claude Code对一个5年前的Vue项目进行重构，包括代码风格统一、性能优化、架构改进等方面的实践经验。整个重构过程历时3周，不仅提升了代码质量，还显著改善了项目的可维护性。',
+                author: '张秋实',
+                authorAvatar: '头像/张秋实-技术委员会.png',
+                department: '技术委员会',
+                date: '2025-01-18',
+                tags: ['Claude Code', '代码重构', 'Vue.js', '性能优化'],
+                views: '3.2k',
+                likes: '256',
+                comments: '89',
+                relatedTools: ['Claude Code', 'VSCode', 'ESLint'],
+                featured: true,
+                category: 'featured'
+            },
+            {
+                id: 2,
+                title: 'WPS AI助力制作年度总结PPT：效率提升10倍',
+                excerpt: '详细介绍如何利用WPS AI的智能生成功能，快速制作高质量的年度总结PPT。从模板选择、内容生成到视觉优化，全流程分享制作技巧和注意事项。',
+                author: '赵小萱',
+                authorAvatar: '头像/赵小萱-技术委员会.png',
+                department: '技术委员会',
+                date: '2025-01-17',
+                tags: ['WPS AI', 'PPT制作', '年度总结', '办公效率'],
+                views: '2.8k',
+                likes: '198',
+                comments: '45',
+                relatedTools: ['WPS AI', 'PowerPoint', '美图秀秀'],
+                featured: true,
+                category: 'popular'
+            },
+            {
+                id: 3,
+                title: 'Notion AI构建个人知识管理体系实践',
+                excerpt: '从零开始用Notion AI构建完整的个人知识管理体系，包括笔记模板设计、标签体系建立、智能检索优化等方法论分享。经过3个月的实践，知识检索效率提升了5倍。',
+                author: '高通',
+                authorAvatar: '头像/高通-组织和人力资源.jpg',
+                department: '组织和人力资源',
+                date: '2025-01-16',
+                tags: ['Notion AI', '知识管理', '效率工具', '个人成长'],
+                views: '4.1k',
+                likes: '312',
+                comments: '67',
+                relatedTools: ['Notion AI', 'Obsidian', 'Logseq'],
+                featured: true,
+                category: 'featured'
+            },
+            {
+                id: 4,
+                title: 'AI绘画工具组合使用：从创意到成品的完整流程',
+                excerpt: '结合Midjourney、即梦、Canva等多个AI工具，展示从创意构思到最终成品的完整设计流程。分享工具选择策略、参数调优技巧和后期处理方法，适合设计师和内容创作者。',
+                author: '李明',
+                authorAvatar: '头像/张秋实-技术委员会.png',
+                department: '产品设计部',
+                date: '2025-01-15',
+                tags: ['AI绘画', 'Midjourney', '设计流程', '创意工作'],
+                views: '2.5k',
+                likes: '189',
+                comments: '34',
+                relatedTools: ['Midjourney', '即梦', 'Canva'],
+                featured: false,
+                category: 'recent'
+            },
+            {
+                id: 5,
+                title: 'ChatGPT辅助需求分析：产品经理的实战指南',
+                excerpt: '作为产品经理，如何利用ChatGPT进行用户需求分析、竞品研究和功能规划。分享提示词设计技巧、分析框架搭建和结果优化方法。',
+                author: '王小雅',
+                authorAvatar: '头像/张秋实-技术委员会.png',
+                department: '产品中心',
+                date: '2025-01-14',
+                tags: ['ChatGPT', '需求分析', '产品管理', '提示词工程'],
+                views: '3.8k',
+                likes: '267',
+                comments: '76',
+                relatedTools: ['ChatGPT', 'Miro', 'FigJam'],
+                featured: false,
+                category: 'popular'
+            },
+            {
+                id: 6,
+                title: '用AI工具自动化测试用例生成：QA效率革命',
+                excerpt: '探索如何使用Claude Code和GitHub Copilot自动生成测试用例，从单元测试到集成测试的完整实践。测试用例生成效率提升了300%，bug发现率也显著提高。',
+                author: '陈志远',
+                authorAvatar: '头像/高通-组织和人力资源.jpg',
+                department: 'QA测试部',
+                date: '2025-01-13',
+                tags: ['自动化测试', 'Claude Code', '测试用例', 'QA'],
+                views: '2.1k',
+                likes: '145',
+                comments: '52',
+                relatedTools: ['Claude Code', 'GitHub Copilot', 'Jest'],
+                featured: false,
+                category: 'recent'
+            },
+            {
+                id: 7,
+                title: 'AI驱动的数据分析：从Excel到洞察的进阶之路',
+                excerpt: '如何将传统的Excel数据分析工作流程升级为AI驱动的智能分析。包括数据清洗、可视化生成、趋势预测等环节的AI工具应用实践。',
+                author: '刘数据',
+                authorAvatar: '头像/赵小萱-技术委员会.png',
+                department: '数据分析部',
+                date: '2025-01-12',
+                tags: ['数据分析', 'Excel', 'AI可视化', '趋势预测'],
+                views: '2.9k',
+                likes: '203',
+                comments: '41',
+                relatedTools: ['ChatGPT', 'Claude', 'Power BI'],
+                featured: false,
+                category: 'popular'
+            },
+            {
+                id: 8,
+                title: '技术文档写作的AI助手：从痛苦到高效',
+                excerpt: '技术文档写作一直是开发者的痛点，分享如何使用各种AI工具提升技术文档的写作效率和质量。包括API文档、用户手册、架构设计文档等多种场景。',
+                author: '文档君',
+                authorAvatar: '头像/高通-组织和人力资源.jpg',
+                department: '技术文档部',
+                date: '2025-01-11',
+                tags: ['技术文档', '写作', 'API文档', '用户手册'],
+                views: '1.8k',
+                likes: '132',
+                comments: '28',
+                relatedTools: ['Claude', 'Notion AI', 'GitBook'],
+                featured: false,
+                category: 'recent'
+            }
+        ];
+
+        // Current filter state
+        let currentFilter = 'all';
+        let filteredPractices = [...bestPracticesData];
+
+        // Initialize page
+        window.addEventListener('DOMContentLoaded', function() {
+            showLoading();
+            // Simulate loading delay
+            setTimeout(() => {
+                hideLoading();
+                renderPractices(bestPracticesData);
+                updateResultsCount(bestPracticesData.length);
+            }, 1000);
+        });
+
+        // Show loading state
+        function showLoading() {
+            const grid = document.getElementById('practicesGrid');
+            grid.innerHTML = Array.from({length: 6}, () => `
+                <div class="loading-card">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div class="loading-placeholder loading-avatar"></div>
+                        <div style="flex: 1;">
+                            <div class="loading-placeholder" style="height: 16px; width: 120px; margin-bottom: 6px;"></div>
+                            <div class="loading-placeholder" style="height: 12px; width: 80px;"></div>
+                        </div>
+                    </div>
+                    <div class="loading-placeholder loading-title"></div>
+                    <div class="loading-placeholder loading-content"></div>
+                    <div class="loading-tags">
+                        <div class="loading-placeholder loading-tag"></div>
+                        <div class="loading-placeholder loading-tag"></div>
+                        <div class="loading-placeholder loading-tag"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Hide loading state
+        function hideLoading() {
+            // Loading will be replaced by actual content
+        }
+
+        // Render practices
+        function renderPractices(practices) {
+            const grid = document.getElementById('practicesGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (practices.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+            
+            grid.innerHTML = practices.map(practice => `
+                <div class="practice-card fade-in" onclick="openPracticeDetail(${practice.id})">
+                    <div class="practice-meta">
+                        <div class="practice-author-avatar">
+                            <img src="${practice.authorAvatar}" alt="${practice.author}">
+                        </div>
+                        <div class="practice-author-info">
+                            <div class="practice-author">${practice.author}</div>
+                            <div class="practice-date">${practice.date} · ${practice.department}</div>
+                        </div>
+                        ${practice.featured ? '<div class="practice-featured-badge">精选</div>' : ''}
+                    </div>
+                    <div class="practice-title">${practice.title}</div>
+                    <div class="practice-excerpt">${practice.excerpt}</div>
+                    <div class="practice-tags">
+                        ${practice.tags.map(tag => `<span class="practice-tag" onclick="event.stopPropagation(); filterBySpecificTag('${tag}')">${tag}</span>`).join('')}
+                    </div>
+                    <div class="practice-stats">
+                        <div class="practice-engagement">
+                            <div class="engagement-item">
+                                <img src="icon/浏览.png" alt="浏览">
+                                <span>${practice.views}</span>
+                            </div>
+                            <div class="engagement-item">
+                                <img src="icon/点赞.png" alt="点赞">
+                                <span>${practice.likes}</span>
+                            </div>
+                            <div class="engagement-item">
+                                <img src="icon/评论.svg" style="width: 12px; height: 12px;" alt="评论">
+                                <span>${practice.comments}</span>
+                            </div>
+                        </div>
+                        <a href="#" class="practice-link" onclick="event.stopPropagation(); openPracticeDetail(${practice.id})">
+                            查看详情 →
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Switch filter
+        function switchFilter(filter) {
+            currentFilter = filter;
+            
+            // Update tab styles
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter practices
+            let filtered = bestPracticesData;
+            
+            switch(filter) {
+                case 'featured':
+                    filtered = bestPracticesData.filter(p => p.featured);
+                    break;
+                case 'popular':
+                    filtered = bestPracticesData.filter(p => parseInt(p.likes) > 200);
+                    break;
+                case 'recent':
+                    filtered = bestPracticesData.filter(p => {
+                        const date = new Date(p.date);
+                        const now = new Date();
+                        const diffTime = Math.abs(now - date);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        return diffDays <= 7;
+                    });
+                    break;
+                default:
+                    filtered = bestPracticesData;
+            }
+            
+            filteredPractices = filtered;
+            renderPractices(filtered);
+            updateResultsCount(filtered.length);
+        }
+
+        // Filter by tag
+        function filterByTag() {
+            const tagValue = document.getElementById('tagFilter').value;
+            applyFilters();
+        }
+
+        // Filter by author
+        function filterByAuthor() {
+            applyFilters();
+        }
+
+        // Sort practices
+        function sortPractices() {
+            applyFilters();
+        }
+
+        // Search practices
+        function searchPractices() {
+            applyFilters();
+        }
+
+        // Filter by specific tag (when clicking on tag)
+        function filterBySpecificTag(tag) {
+            document.getElementById('tagFilter').value = tag;
+            applyFilters();
+        }
+
+        // Apply all filters
+        function applyFilters() {
+            let filtered = [...bestPracticesData];
+            
+            // Apply main category filter
+            switch(currentFilter) {
+                case 'featured':
+                    filtered = filtered.filter(p => p.featured);
+                    break;
+                case 'popular':
+                    filtered = filtered.filter(p => parseInt(p.likes) > 200);
+                    break;
+                case 'recent':
+                    filtered = filtered.filter(p => {
+                        const date = new Date(p.date);
+                        const now = new Date();
+                        const diffTime = Math.abs(now - date);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        return diffDays <= 7;
+                    });
+                    break;
+            }
+            
+            // Apply tag filter
+            const tagFilter = document.getElementById('tagFilter').value;
+            if (tagFilter !== 'all') {
+                filtered = filtered.filter(p => p.tags.includes(tagFilter));
+            }
+            
+            // Apply author filter
+            const authorFilter = document.getElementById('authorFilter').value;
+            if (authorFilter !== 'all') {
+                filtered = filtered.filter(p => p.author === authorFilter);
+            }
+            
+            // Apply search filter
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (searchQuery) {
+                filtered = filtered.filter(p => 
+                    p.title.toLowerCase().includes(searchQuery) ||
+                    p.excerpt.toLowerCase().includes(searchQuery) ||
+                    p.tags.some(tag => tag.toLowerCase().includes(searchQuery))
+                );
+            }
+            
+            // Apply sort
+            const sortBy = document.getElementById('sortFilter').value;
+            switch(sortBy) {
+                case 'latest':
+                    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    break;
+                case 'popular':
+                    filtered.sort((a, b) => parseInt(b.comments) - parseInt(a.comments));
+                    break;
+                case 'views':
+                    filtered.sort((a, b) => parseFloat(b.views) - parseFloat(a.views));
+                    break;
+                case 'likes':
+                    filtered.sort((a, b) => parseInt(b.likes) - parseInt(a.likes));
+                    break;
+            }
+            
+            filteredPractices = filtered;
+            renderPractices(filtered);
+            updateResultsCount(filtered.length);
+        }
+
+        // Update results count
+        function updateResultsCount(count) {
+            document.getElementById('totalResults').textContent = count;
+        }
+
+        // Reset filters
+        function resetFilters() {
+            currentFilter = 'all';
+            
+            // Reset tab styles
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector('.filter-tab').classList.add('active');
+            
+            // Reset form controls
+            document.getElementById('tagFilter').value = 'all';
+            document.getElementById('authorFilter').value = 'all';
+            document.getElementById('sortFilter').value = 'latest';
+            document.getElementById('searchInput').value = '';
+            
+            // Show all practices
+            filteredPractices = bestPracticesData;
+            renderPractices(bestPracticesData);
+            updateResultsCount(bestPracticesData.length);
+        }
+
+        // Open practice detail (redirect to forum)
+        function openPracticeDetail(practiceId) {
+            console.log('Open practice detail for ID:', practiceId);
+            // 修复：直接跳转到论坛对应的帖子
+            const practice = bestPracticesData.find(p => p.id === practiceId);
+            if (practice) {
+                // 根据practiceId跳转到对应的论坛帖子
+                let forumPostId = 'forum1'; // 默认值
+                
+                // 根据实战案例ID映射到论坛帖子ID
+                const practiceToForumMap = {
+                    'practice1': 'forum1',
+                    'practice2': 'forum2', 
+                    'practice3': 'forum3',
+                    'practice4': 'forum4',
+                    'practice5': 'forum5',
+                    'practice6': 'forum6',
+                    'practice7': 'forum7',
+                    'practice8': 'forum8'
+                };
+                
+                if (practiceToForumMap[practiceId]) {
+                    forumPostId = practiceToForumMap[practiceId];
+                }
+                
+                // 跳转到论坛帖子详情页
+                const url = `论坛/forum-post-detail.html?id=${forumPostId}&title=${encodeURIComponent(practice.title)}`;
+                window.open(url, '_blank');
+            }
+        }
+
+        // Add animation delay to cards
+        function addFadeInAnimation() {
+            const cards = document.querySelectorAll('.practice-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('fade-in');
+                }, index * 50);
+            });
+        }
+
+        // ========== 用户认证相关功能 ==========
+        
+        // 页面加载时检查登录状态
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAuthUI();
+        });
+
+        // 更新认证UI
+        function updateAuthUI() {
+            if (apiService.isLoggedIn()) {
+                const userInfo = apiService.getUserInfo();
+                document.getElementById('loginButtons').style.display = 'none';
+                document.getElementById('userProfile').style.display = 'block';
+                
+                if (userInfo) {
+                    document.getElementById('userDisplayName').textContent = userInfo.username || '用户';
+                    document.getElementById('userPoints').textContent = userInfo.points || 0;
+                    document.getElementById('userLevel').textContent = `Lv${userInfo.level || 1} ${userInfo.level_name || '新手'}`;
+                    
+                    if (userInfo.avatar) {
+                        document.getElementById('userAvatar').src = userInfo.avatar;
+                    }
+                }
+            } else {
+                document.getElementById('loginButtons').style.display = 'flex';
+                document.getElementById('userProfile').style.display = 'none';
+            }
+        }
+
+        // 显示登录模态框
+        function showLoginModal() {
+            document.getElementById('authModal').style.display = 'flex';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 显示注册模态框
+        function showRegisterModal() {
+            document.getElementById('authModal').style.display = 'flex';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭认证模态框
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // 切换到注册
+        function switchToRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+
+        // 切换到登录
+        function switchToLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        }
+
+        // 处理登录
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const username = formData.get('username');
+            const password = formData.get('password');
+            
+            try {
+                await apiService.login(username, password);
+                showToast('登录成功');
+                closeAuthModal();
+                updateAuthUI();
+            } catch (error) {
+                showToast('登录失败：' + error.message);
+            }
+        }
+
+        // 处理注册
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const username = formData.get('username');
+            const email = formData.get('email');
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+            
+            if (password !== confirmPassword) {
+                showToast('密码确认不匹配');
+                return;
+            }
+            
+            try {
+                await apiService.register(username, email, password);
+                showToast('注册成功');
+                closeAuthModal();
+                updateAuthUI();
+            } catch (error) {
+                showToast('注册失败：' + error.message);
+            }
+        }
+
+        // 用户菜单切换
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // 退出登录
+        async function logout() {
+            try {
+                await apiService.logout();
+                showToast('退出登录成功');
+                updateAuthUI();
+                document.getElementById('userDropdown').style.display = 'none';
+            } catch (error) {
+                showToast('退出失败：' + error.message);
+            }
+        }
+
+        // 显示消息提示
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.top = '20px';
+            toast.style.right = '20px';
+            toast.style.background = 'var(--ks-dark)';
+            toast.style.color = 'white';
+            toast.style.padding = '12px 20px';
+            toast.style.borderRadius = '8px';
+            toast.style.zIndex = '9999';
+            toast.style.fontSize = '14px';
+            toast.style.boxShadow = 'var(--shadow-lg)';
+            toast.style.transform = 'translateX(100%)';
+            toast.style.transition = 'transform 0.3s ease';
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+            }, 10);
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 2000);
+        }
+
+        // 点击外部关闭下拉菜单
+        document.addEventListener('click', function(e) {
+            const userMenu = document.querySelector('.user-profile-menu');
+            const dropdown = document.getElementById('userDropdown');
+            
+            if (userMenu && !userMenu.contains(e.target) && dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // 添加logout函数
+        function logout() {
+            alert('正在退出登录...');
+            // 实际应用中这里会处理退出登录逻辑
+        }
+    </script>
+    
+    <!-- 引入统一Header组件JavaScript -->
+    <script src="components/header.js"></script>
+</body>
+</html>

@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户资料 - 金山云企业文化窗口</title>
+    <!-- 引入统一Header组件样式 -->
+    <link rel="stylesheet" href="components/header.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ks-red: #E60012;
+            --ks-dark: #1A1A1A;
+            --ks-gray: #666666;
+            --ks-light-gray: #F5F5F5;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #FAFAFA;
+            line-height: 1.6;
+            color: var(--ks-dark);
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #E0E0E0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 64px;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 0 24px;
+        }
+
+        .logo img {
+            height: 32px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-item {
+            color: var(--ks-dark);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--ks-red);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--ks-red);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 8px 36px 8px 12px;
+            border: 1px solid #E0E0E0;
+            border-radius: 20px;
+            width: 200px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--ks-red);
+            width: 240px;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            background: url('icon/搜索.png') no-repeat center;
+            background-size: contain;
+        }
+
+        .notification-btn {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f8f8f8;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-btn:hover {
+            background: rgba(230, 0, 18, 0.1);
+        }
+
+        .notification-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--ks-red);
+            border-radius: 50%;
+        }
+
+        .user-avatar {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            padding: 8px;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+            border: 1px solid #F0F0F0;
+        }
+
+        .user-avatar:hover .user-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--ks-dark);
+        }
+
+        .dropdown-item:hover {
+            background: rgba(230, 0, 18, 0.05);
+            color: var(--ks-red);
+        }
+
+        .dropdown-item img {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .dropdown-item:hover img {
+            opacity: 1;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 24px;
+        }
+
+        .profile-header {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--ks-red), #FF6B6B);
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            border: 4px solid white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .level-badge {
+            position: absolute;
+            bottom: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 16px;
+            border: 3px solid white;
+        }
+
+        .profile-details h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .profile-meta {
+            font-size: 16px;
+            color: var(--ks-gray);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 32px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--ks-red);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--ks-gray);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .content-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(230, 0, 18, 0.1), rgba(255, 107, 107, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .activity-icon img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .activity-info {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .activity-meta {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f8f8f8;
+            border-radius: 12px;
+        }
+
+        .achievement-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--ks-red), #FF6B6B);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .achievement-icon img {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) invert(1);
+        }
+
+        .achievement-info {
+            flex: 1;
+        }
+
+        .achievement-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .achievement-date {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ks-gray);
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="01-金山 金山云logo-04.png" alt="金山云">
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">首页</a>
+                <a href="ai-tools.html" class="nav-item">AI工具</a>
+                <a href="论坛/forum.html" class="nav-item">同事论坛</a>
+                <a href="#" class="nav-item">学习平台</a>
+                <a href="#" class="nav-item">企业活动</a>
+            </nav>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="搜索...">
+                    <button class="search-btn"></button>
+                </div>
+                <button class="notification-btn" onclick="window.location.href='profile.html#notifications'">
+                    <img src="icon/通知.png" alt="通知">
+                    <div class="notification-badge"></div>
+                </button>
+                <div class="user-avatar">
+                    <div class="avatar-img" style="background-image: url('头像/张秋实-技术委员会.png');"></div>
+                    <div class="user-dropdown">
+                        <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                            <img src="icon/用户.svg" alt="个人中心">
+                            <span>个人中心</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <img src="icon/目标.svg" alt="我的成就">
+                            <span>我的成就</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <img src="icon/设置.png" alt="设置">
+                            <span>设置</span>
+                        </div>
+                        <div class="dropdown-item" onclick="logout()">
+                            <img src="icon/时间.svg" alt="退出">
+                            <span>退出登录</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-info">
+                <div class="profile-avatar" style="background-image: url('头像/张秋实-技术委员会.png');">
+                    <div class="level-badge">LV5</div>
+                </div>
+                <div class="profile-details">
+                    <h1>张秋实</h1>
+                    <div class="profile-meta">
+                        高级技术专家 · 技术委员会<br>
+                        北京 · 加入时间：2020年3月<br>
+                        专业领域：云计算架构、AI应用开发
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">234</div>
+                            <div class="stat-label">发帖数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">3.2k</div>
+                            <div class="stat-label">获赞数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">156</div>
+                            <div class="stat-label">关注者</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">89</div>
+                            <div class="stat-label">关注中</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Recent Activities -->
+            <div class="content-section">
+                <div class="section-title">
+                    <img src="icon/活动.png" alt="最近活动">
+                    最近活动
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <img src="icon/论坛.png" alt="发帖">
+                    </div>
+                    <div class="activity-info">
+                        <div class="activity-title">发布了新帖子《AI在云计算中的应用实践》</div>
+                        <div class="activity-meta">2小时前 · 获得 23 个赞</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <img src="icon/评论.svg" alt="评论">
+                    </div>
+                    <div class="activity-info">
+                        <div class="activity-title">回复了《微服务架构设计模式》</div>
+                        <div class="activity-meta">5小时前 · 获得 12 个赞</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <img src="icon/学习平台.png" alt="学习">
+                    </div>
+                    <div class="activity-info">
+                        <div class="activity-title">完成了《云原生技术实战》课程</div>
+                        <div class="activity-meta">1天前 · 获得认证</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <img src="icon/点赞.png" alt="点赞">
+                    </div>
+                    <div class="activity-info">
+                        <div class="activity-title">点赞了《前端性能优化最佳实践》</div>
+                        <div class="activity-meta">2天前</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievements -->
+            <div class="content-section">
+                <div class="section-title">
+                    <img src="icon/奖杯.svg" alt="成就荣誉">
+                    成就荣誉
+                </div>
+                <div class="achievement-grid">
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <img src="icon/明星.svg" alt="技术专家">
+                        </div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">技术专家</div>
+                            <div class="achievement-date">2025-01-15</div>
+                        </div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <img src="icon/庆祝.svg" alt="优秀员工">
+                        </div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">优秀员工</div>
+                            <div class="achievement-date">2025-01-10</div>
+                        </div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <img src="icon/火箭.svg" alt="创新达人">
+                        </div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">创新达人</div>
+                            <div class="achievement-date">2025-01-05</div>
+                        </div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <img src="icon/灯泡.svg" alt="知识分享者">
+                        </div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">知识分享者</div>
+                            <div class="achievement-date">2024-12-28</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Learning Progress -->
+            <div class="content-section full-width">
+                <div class="section-title">
+                    <img src="icon/学习积分.png" alt="学习进度">
+                    学习进度与数据分析
+                </div>
+                <div class="chart-placeholder">
+                    📊 学习数据可视化图表（学习时长、课程完成情况、技能雷达图）
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            alert('正在退出登录...');
+        }
+    </script>
+</body>
+</html>

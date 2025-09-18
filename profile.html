@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 金山云企业文化窗口</title>
+    <!-- 引入统一Header组件样式 -->
+    <link rel="stylesheet" href="components/header.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ks-red: #E60012;
+            --ks-dark: #1A1A1A;
+            --ks-gray: #666666;
+            --ks-light-gray: #F5F5F5;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #FAFAFA;
+            line-height: 1.6;
+            color: var(--ks-dark);
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #E0E0E0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 64px;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 0 24px;
+        }
+
+        .logo img {
+            height: 32px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-item {
+            color: var(--ks-dark);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--ks-red);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--ks-red);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 8px 36px 8px 12px;
+            border: 1px solid #E0E0E0;
+            border-radius: 20px;
+            width: 200px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--ks-red);
+            width: 240px;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            background: url('icon/搜索.png') no-repeat center;
+            background-size: contain;
+        }
+
+        .user-avatar:hover .user-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-avatar:hover .avatar-img {
+            box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.2);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            padding: 8px;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+            border: 1px solid #F0F0F0;
+        }
+
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 16px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            transform: rotate(45deg);
+            border-left: 1px solid #F0F0F0;
+            border-top: 1px solid #F0F0F0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--ks-dark);
+        }
+
+        .dropdown-item:hover {
+            background: rgba(230, 0, 18, 0.05);
+            color: var(--ks-red);
+        }
+
+        .dropdown-item img {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .dropdown-item:hover img {
+            opacity: 1;
+        }
+
+        .dropdown-item span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #F0F0F0;
+            margin: 8px 0;
+        }
+
+        .notification-btn {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f8f8f8;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-btn:hover {
+            background: rgba(230, 0, 18, 0.1);
+        }
+
+        .notification-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--ks-red);
+            border-radius: 50%;
+        }
+
+        .user-avatar {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-image: url('cd4bd41dc215915e39fa6964ce208923.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 32px;
+        }
+
+        /* Left Sidebar */
+        .profile-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--ks-red), #FF6B6B);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-image: url('cd4bd41dc215915e39fa6964ce208923.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .level-badge {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 12px;
+            border: 2px solid white;
+        }
+
+        .profile-info h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .profile-meta {
+            font-size: 14px;
+            color: var(--ks-gray);
+            line-height: 1.4;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: #f8f8f8;
+            border-radius: 12px;
+        }
+
+        .stat-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--ks-red);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        .progress-section {
+            margin-bottom: 20px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .progress-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #E0E0E0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--ks-red), #FF6B6B);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .progress-tip {
+            font-size: 12px;
+            color: var(--ks-red);
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid #E0E0E0;
+            background: white;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            border-color: var(--ks-red);
+            color: var(--ks-red);
+        }
+
+        .action-btn.primary {
+            background: var(--ks-red);
+            color: white;
+            border-color: var(--ks-red);
+        }
+
+        .action-btn.primary:hover {
+            background: #c5000f;
+        }
+
+        /* Honors Section */
+        .honors-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .honors-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .honors-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .honors-title img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .view-all-btn {
+            font-size: 12px;
+            color: var(--ks-red);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .honors-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .honor-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .honor-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--ks-red), #FF6B6B);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .honor-icon img {
+            width: 18px;
+            height: 18px;
+            filter: brightness(0) invert(1);
+        }
+
+        .honor-info {
+            flex: 1;
+        }
+
+        .honor-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .honor-date {
+            font-size: 11px;
+            color: var(--ks-gray);
+        }
+
+        .pin-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+
+        .pin-btn:hover {
+            opacity: 1;
+        }
+
+        .pin-btn.pinned {
+            opacity: 1;
+            color: var(--ks-red);
+        }
+
+        /* Right Content Area */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .content-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .section-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--ks-light-gray);
+            border-radius: 24px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .section-tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: transparent;
+            border: none;
+            position: relative;
+        }
+
+        .section-tab.active {
+            background: white;
+            box-shadow: var(--shadow-sm);
+            color: var(--ks-red);
+        }
+
+        .tab-count {
+            font-size: 12px;
+            background: rgba(230, 0, 18, 0.1);
+            color: var(--ks-red);
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin-left: 6px;
+        }
+
+        .content-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .content-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border: 1px solid #F0F0F0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .content-item:hover {
+            border-color: var(--ks-red);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .content-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(230, 0, 18, 0.1), rgba(255, 107, 107, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .content-icon img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .content-info {
+            flex: 1;
+        }
+
+        .content-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .content-meta {
+            font-size: 12px;
+            color: var(--ks-gray);
+            display: flex;
+            gap: 16px;
+        }
+
+        .content-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status-published {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+
+        .status-draft {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        /* Learning Section */
+        .learning-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .learning-card {
+            padding: 16px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .learning-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--ks-red);
+            margin-bottom: 4px;
+        }
+
+        .learning-label {
+            font-size: 12px;
+            color: var(--ks-gray);
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ks-gray);
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="01-金山 金山云logo-04.png" alt="金山云">
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">首页</a>
+                <div class="nav-dropdown">
+                    <div class="nav-dropdown-trigger">
+                        <a href="#" class="nav-item">AI工具</a>
+                        <img src="icon/下拉箭头.svg" class="dropdown-arrow" alt="下拉">
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="ai-tools.html" class="dropdown-item">AI工具库</a>
+                        <a href="ai-practices.html" class="dropdown-item">AI实战</a>
+                        <a href="ai-toolkits.html" class="dropdown-item">专题工具箱</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown forum-dropdown">
+                    <div class="nav-dropdown-trigger">
+                        <a href="论坛/forum.html" class="nav-item">同事论坛</a>
+                        <img src="icon/下拉箭头.svg" class="dropdown-arrow" alt="下拉">
+                    </div>
+                    <div class="dropdown-menu forum-dropdown-menu">
+                        <div class="forum-dropdown-content">
+                            <div class="forum-dropdown-section">
+                                <h4 class="dropdown-section-title">论坛</h4>
+                                <div class="dropdown-items">
+                                    <a href="论坛/forum.html?category=qa" class="dropdown-item">问答回响</a>
+                                    <a href="论坛/forum.html?category=knowledge" class="dropdown-item">知识分享</a>
+                                    <a href="论坛/forum.html?category=life" class="dropdown-item">生活文娱</a>
+                                </div>
+                            </div>
+                            <div class="forum-dropdown-section">
+                                <h4 class="dropdown-section-title">资讯</h4>
+                                <div class="dropdown-items">
+                                    <a href="论坛/forum.html?tab=news&category=company" class="dropdown-item">公司动态</a>
+                                    <a href="论坛/forum.html?tab=news&category=industry" class="dropdown-item">行业资讯</a>
+                                    <a href="论坛/forum.html?tab=news&category=tech" class="dropdown-item">技术前沿</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#" class="nav-item">学习平台</a>
+                <a href="#" class="nav-item">企业活动</a>
+            </nav>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="搜索...">
+                    <button class="search-btn">
+                        <img src="icon/搜索.png" alt="搜索" style="width: 16px; height: 16px;">
+                    </button>
+                </div>
+                <div class="notification-btn">
+                    <img src="icon/通知.png" alt="通知">
+                    <div class="notification-badge"></div>
+                </div>
+                <div class="user-avatar">
+                    <div class="avatar-img" style="background-image: url('cd4bd41dc215915e39fa6964ce208923.jpg'); background-size: cover; background-position: center;"></div>
+                    <div class="user-dropdown">
+                        <div class="dropdown-item" onclick="window.location.href='profile.html'">
+                            <img src="icon/用户.svg" alt="个人中心">
+                            <span>个人中心</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <img src="icon/目标.svg" alt="我的成就">
+                            <span>我的成就</span>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item">
+                            <img src="icon/文件夹.svg" alt="设置">
+                            <span>设置</span>
+                        </div>
+                        <div class="dropdown-item" onclick="logout()">
+                            <img src="icon/时间.svg" alt="退出">
+                            <span>退出登录</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Left Sidebar -->
+        <div class="profile-sidebar">
+            <!-- Profile Card -->
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                    </div>
+                    <div class="profile-info">
+                        <h2>谢其乐</h2>
+                        <div class="profile-meta">
+                            高级前端工程师<br>
+                            技术委员会 / 北京
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">156</div>
+                        <div class="stat-label">发帖数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">2.1k</div>
+                        <div class="stat-label">点赞数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">等级</div>
+                    </div>
+                </div>
+
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <div class="progress-title">升级进度</div>
+                        <div class="progress-text">经验值 480/600</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%"></div>
+                    </div>
+                    <div class="progress-tip">再发 2 篇帖子可升级到 LV6</div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn primary">编辑资料</button>
+                    <button class="action-btn">查看权益</button>
+                </div>
+            </div>
+
+            <!-- Honors Section -->
+            <div class="honors-section">
+                <div class="honors-header">
+                    <div class="honors-title">
+                        <img src="icon/奖杯.svg" alt="荣誉">
+                        荣誉展示
+                    </div>
+                    <a href="#" class="view-all-btn">查看更多</a>
+                </div>
+                <div class="honors-list">
+                    <div class="honor-item">
+                        <div class="honor-icon">
+                            <img src="icon/明星.svg" alt="金指针">
+                        </div>
+                        <div class="honor-info">
+                            <div class="honor-name">金指针认证</div>
+                            <div class="honor-date">2025-01-15</div>
+                        </div>
+                        <button class="pin-btn pinned">📌</button>
+                    </div>
+                    <div class="honor-item">
+                        <div class="honor-icon">
+                            <img src="icon/庆祝.svg" alt="优秀员工">
+                        </div>
+                        <div class="honor-info">
+                            <div class="honor-name">优秀员工</div>
+                            <div class="honor-date">2025-01-10</div>
+                        </div>
+                        <button class="pin-btn">📌</button>
+                    </div>
+                    <div class="honor-item">
+                        <div class="honor-icon">
+                            <img src="icon/火箭.svg" alt="技术达人">
+                        </div>
+                        <div class="honor-info">
+                            <div class="honor-name">技术达人</div>
+                            <div class="honor-date">2025-01-05</div>
+                        </div>
+                        <button class="pin-btn">📌</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Content Area -->
+        <div class="content-area">
+            <!-- My Content Section -->
+            <div class="content-section" id="my-content">
+                <div class="section-header">
+                    <div class="section-title">
+                        <img src="icon/创作.png" alt="我的内容">
+                        我的内容
+                    </div>
+                </div>
+                <div class="section-tabs">
+                    <button class="section-tab active">
+                        我的帖子 <span class="tab-count">156</span>
+                    </button>
+                    <button class="section-tab">
+                        我的回答 <span class="tab-count">89</span>
+                    </button>
+                    <button class="section-tab">
+                        收藏夹 <span class="tab-count">234</span>
+                    </button>
+                    <button class="section-tab">
+                        草稿箱 <span class="tab-count">12</span>
+                    </button>
+                </div>
+                <div class="content-list">
+                    <div class="content-item">
+                        <div class="content-icon">
+                            <img src="icon/论坛.png" alt="帖子">
+                        </div>
+                        <div class="content-info">
+                            <div class="content-title">Claude AI 在前端开发中的实践应用</div>
+                            <div class="content-meta">
+                                <span>2025-01-15</span>
+                                <span>156 次查看</span>
+                                <span>23 个赞</span>
+                            </div>
+                        </div>
+                        <div class="content-status status-published">已发布</div>
+                    </div>
+                    <div class="content-item">
+                        <div class="content-icon">
+                            <img src="icon/论坛.png" alt="帖子">
+                        </div>
+                        <div class="content-info">
+                            <div class="content-title">JavaScript 性能优化的几个技巧</div>
+                            <div class="content-meta">
+                                <span>2025-01-14</span>
+                                <span>89 次查看</span>
+                                <span>15 个赞</span>
+                            </div>
+                        </div>
+                        <div class="content-status status-published">已发布</div>
+                    </div>
+                    <div class="content-item">
+                        <div class="content-icon">
+                            <img src="icon/论坛.png" alt="帖子">
+                        </div>
+                        <div class="content-info">
+                            <div class="content-title">React Hooks 深度解析</div>
+                            <div class="content-meta">
+                                <span>2025-01-13</span>
+                                <span>待完善</span>
+                            </div>
+                        </div>
+                        <div class="content-status status-draft">草稿</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Interactions Section -->
+            <div class="content-section" id="interactions">
+                <div class="section-header">
+                    <div class="section-title">
+                        <img src="icon/心形.svg" alt="我的互动">
+                        我的互动
+                    </div>
+                </div>
+                <div class="section-tabs">
+                    <button class="section-tab active">
+                        点赞记录 <span class="tab-count">2.1k</span>
+                    </button>
+                    <button class="section-tab">
+                        关注问题 <span class="tab-count">45</span>
+                    </button>
+                    <button class="section-tab">
+                        评论回复 <span class="tab-count">234</span>
+                    </button>
+                </div>
+                <div class="content-list">
+                    <div class="content-item">
+                        <div class="content-icon">
+                            <img src="icon/心形.svg" alt="点赞">
+                        </div>
+                        <div class="content-info">
+                            <div class="content-title">微服务架构设计模式详解</div>
+                            <div class="content-meta">
+                                <span>点赞于 2025-01-15</span>
+                                <span>作者：李小明</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-item">
+                        <div class="content-icon">
+                            <img src="icon/评论.svg" alt="评论">
+                        </div>
+                        <div class="content-info">
+                            <div class="content-title">关于AI工具在开发中的应用讨论</div>
+                            <div class="content-meta">
+                                <span>回复于 2025-01-14</span>
+                                <span>获得 8 个赞</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Learning & Growth Section -->
+            <div class="content-section" id="learning">
+                <div class="section-header">
+                    <div class="section-title">
+                        <img src="icon/学习平台.png" alt="学习与成长">
+                        学习与成长
+                    </div>
+                </div>
+                <div class="learning-grid">
+                    <div class="learning-card">
+                        <div class="learning-number">12</div>
+                        <div class="learning-label">已完成课程</div>
+                    </div>
+                    <div class="learning-card">
+                        <div class="learning-number">156</div>
+                        <div class="learning-label">学习小时</div>
+                    </div>
+                    <div class="learning-card">
+                        <div class="learning-number">3</div>
+                        <div class="learning-label">进行中课程</div>
+                    </div>
+                    <div class="learning-card">
+                        <div class="learning-number">89%</div>
+                        <div class="learning-label">任务完成率</div>
+                    </div>
+                </div>
+                <div class="chart-placeholder">
+                    📊 成长数据可视化图表（周活跃图、积分变化）
+                </div>
+            </div>
+
+            <!-- Notifications Center Section -->
+            <div class="content-section" id="notifications">
+                <div class="section-header">
+                    <div class="section-title">
+                        <img src="icon/通知.png" alt="通知中心">
+                        通知中心
+                    </div>
+                </div>
+                <div class="section-tabs">
+                    <button class="section-tab active">
+                        系统通知 <span class="tab-count">5</span>
+                    </button>
+                    <button class="section-tab">
+                        评论回复 <span class="tab-count">12</span>
+                    </button>
+                    <button class="section-tab">
+                        勋章荣誉 <span class="tab-count">3</span>
+                    </button>
+                </div>
+                <div class="content-list">
+                    <div class="content-item">
+                        <div class="content-icon">
+                            <img src="icon/通知.png" alt="系统通知">
+                        </div>
+                        <div class="content-info">
+                            <div class="content-title">系统维护通知</div>
+                            <div class="content-meta">
+                                <span>2025-01-15 14:30</span>
+                                <span>未读</span>
+                            </div>
+                        </div>
+                        <div class="content-status status-draft">未读</div>
+                    </div>
+                    <div class="content-item">
+                        <div class="content-icon">
+                            <img src="icon/评论.svg" alt="评论回复">
+                        </div>
+                        <div class="content-info">
+                            <div class="content-title">李小明回复了你的帖子</div>
+                            <div class="content-meta">
+                                <span>2025-01-15 10:20</span>
+                                <span>获得 3 个赞</span>
+                            </div>
+                        </div>
+                        <div class="content-status status-published">已读</div>
+                    </div>
+                    <div class="content-item">
+                        <div class="content-icon">
+                            <img src="icon/明星.svg" alt="勋章荣誉">
+                        </div>
+                        <div class="content-info">
+                            <div class="content-title">恭喜获得金指针认证勋章</div>
+                            <div class="content-meta">
+                                <span>2025-01-15 09:00</span>
+                                <span>荣誉类型</span>
+                            </div>
+                        </div>
+                        <div class="content-status status-published">已读</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show notifications (placeholder)
+        function showNotifications() {
+            // 跳转到通知中心区域
+            const notificationsSection = document.getElementById('notifications');
+            if (notificationsSection) {
+                notificationsSection.scrollIntoView({ behavior: 'smooth' });
+                // 高亮通知中心区域
+                notificationsSection.style.border = '2px solid var(--ks-red)';
+                setTimeout(() => {
+                    notificationsSection.style.border = 'none';
+                }, 3000);
+            }
+        }
+
+        // 页面加载时处理锚点导航
+        document.addEventListener('DOMContentLoaded', function() {
+            const hash = window.location.hash;
+            if (hash) {
+                const targetSection = document.querySelector(hash);
+                if (targetSection) {
+                    setTimeout(() => {
+                        targetSection.scrollIntoView({ behavior: 'smooth' });
+                        // 高亮目标区域
+                        targetSection.style.border = '2px solid var(--ks-red)';
+                        setTimeout(() => {
+                            targetSection.style.border = 'none';
+                        }, 3000);
+                    }, 100);
+                }
+            }
+        });
+
+        // Tab switching functionality
+        document.querySelectorAll('.section-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from siblings
+                this.parentNode.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Here you would load the corresponding content
+                console.log('Switching to:', this.textContent);
+            });
+        });
+
+        // Pin/unpin honors
+        document.querySelectorAll('.pin-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('pinned');
+            });
+        });
+
+        // 添加logout函数
+        function logout() {
+            alert('正在退出登录...');
+            // 实际应用中这里会处理退出登录逻辑
+        }
+    </script>
+    
+    <!-- 引入统一Header组件JavaScript -->
+    <script src="components/header.js"></script>
+</body>
+</html>

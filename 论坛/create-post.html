@@ -1,0 +1,2679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发布新帖 - 企业论坛</title>
+    
+    <link rel="stylesheet" href="../components/header.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #E60012;
+            --primary-dark: #1A1A1A;
+            --text-gray: #666666;
+            --bg-light: #F5F5F5;
+            --white: #FFFFFF;
+            --border-light: #e5e7eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+            color: var(--primary-dark);
+            background: #FAFAFA;
+            min-height: 100vh;
+        }
+
+        /* Background Pattern */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 20%, rgba(230, 0, 18, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(230, 0, 18, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            padding: 32px 20px;
+            min-height: calc(100vh - 72px);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .sidebar-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sidebar-content {
+            padding: 20px;
+        }
+
+        /* Category Selection */
+        .category-selector {
+            margin-bottom: 0;
+        }
+
+        .primary-categories {
+            margin-bottom: 24px;
+        }
+
+        .primary-category {
+            display: block;
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border-light);
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .primary-category:hover {
+            border-color: var(--primary-color);
+            background: rgba(230, 0, 18, 0.05);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .primary-category.selected {
+            border-color: var(--primary-color);
+            background: rgba(230, 0, 18, 0.08);
+            color: var(--primary-color);
+        }
+
+        .primary-category.selected::after {
+            content: '✓';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .category-icon {
+            margin-right: 12px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .secondary-categories {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .secondary-categories.hidden {
+            display: none;
+        }
+
+        .secondary-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-gray);
+            margin-bottom: 12px;
+        }
+
+        .secondary-category {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            background: #fafbfc;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+        }
+
+        .secondary-category:hover {
+            border-color: var(--primary-color);
+            background: rgba(230, 0, 18, 0.05);
+            color: var(--primary-color);
+        }
+
+        .secondary-category.selected {
+            border-color: var(--primary-color);
+            background: rgba(230, 0, 18, 0.08);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* Publishing Guidelines */
+        .guidelines {
+            background: linear-gradient(135deg, #fef7f0 0%, #fdf2f8 100%);
+            border: 1px solid #fed7aa;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 0;
+        }
+
+        .guidelines-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #ea580c;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .guidelines-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .guidelines-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #7c2d12;
+        }
+
+        .guidelines-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .guidelines-item::before {
+            content: '•';
+            color: #ea580c;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* Main Content Area */
+        .main-content-area {
+            min-width: 0; /* 防止内容溢出 */
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: var(--text-gray);
+            grid-column: 1 / -1;
+        }
+
+        .breadcrumb a {
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-color);
+        }
+
+        .breadcrumb .current {
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+
+        /* Post Form Container */
+        .post-form-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .form-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border-light);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+        }
+
+        .form-subtitle {
+            color: var(--text-gray);
+            font-size: 14px;
+        }
+
+        /* Form Content */
+        .form-content {
+            padding: 24px;
+        }
+
+        .form-section {
+            margin-bottom: 24px;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title.required::after {
+            content: '*';
+            color: var(--error-color);
+            font-weight: bold;
+        }
+
+        /* Form Fields */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+        }
+
+        .form-label.required::after {
+            content: ' *';
+            color: var(--error-color);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--error-color);
+        }
+
+        /* 移除原来的分类选择样式 */
+
+        /* Rich Text Editor */
+        .editor-container {
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .editor-container.focused {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.1);
+        }
+
+        .editor-toolbar {
+            background: #f8fafc;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 4px;
+            padding-right: 12px;
+            border-right: 1px solid var(--border-light);
+        }
+
+        .toolbar-group:last-child {
+            border-right: none;
+            padding-right: 0;
+        }
+
+        .toolbar-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: var(--text-gray);
+        }
+
+        .toolbar-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary-dark);
+        }
+
+        .toolbar-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .editor-content {
+            min-height: 300px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            outline: none;
+            background: white;
+        }
+
+        .editor-content:empty::before {
+            content: "请输入帖子内容，支持富文本编辑...";
+            color: #9ca3af;
+            pointer-events: none;
+        }
+
+        /* Code Block Styles */
+        .code-block {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 12px 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '代码';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 12px;
+            color: #64748b;
+            background: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .inline-code {
+            background: #f1f5f9;
+            color: #e11d48;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        /* File Upload */
+        .upload-area {
+            border: 2px dashed var(--border-light);
+            border-radius: 8px;
+            padding: 24px 16px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #fafbfc;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: var(--primary-color);
+            background: rgba(230, 0, 18, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            color: var(--text-gray);
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: var(--primary-dark);
+            margin-bottom: 6px;
+        }
+
+        .upload-hint {
+            font-size: 11px;
+            color: var(--text-gray);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Preview Images */
+        .image-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 24px;
+            height: 24px;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .remove-image:hover {
+            background: var(--error-color);
+        }
+
+        /* File Preview */
+        .file-preview {
+            width: 100%;
+            height: 100%;
+            background: #f8fafc;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .file-icon {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .file-info {
+            width: 100%;
+        }
+
+        .file-name {
+            font-size: 11px;
+            color: var(--primary-dark);
+            font-weight: 500;
+            margin-bottom: 4px;
+            word-break: break-all;
+            line-height: 1.2;
+        }
+
+        .file-size {
+            font-size: 10px;
+            color: var(--text-gray);
+        }
+
+        /* Tags Input */
+        .tags-container {
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            padding: 8px;
+            min-height: 44px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            cursor: text;
+            transition: border-color 0.3s;
+        }
+
+        .tags-container:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.1);
+        }
+
+        .tag-item {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tag-remove {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tag-input {
+            border: none;
+            outline: none;
+            padding: 8px;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        /* Post Settings */
+        .post-settings {
+            background: #f8fafc;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .settings-grid .setting-item:nth-child(odd):last-child {
+            grid-column: 1 / -1;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .setting-label {
+            font-size: 14px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting-description {
+            font-size: 12px;
+            color: var(--text-gray);
+            margin-top: 2px;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--primary-color);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        /* Checkbox Style */
+        .setting-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-light);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .setting-checkbox:checked {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .setting-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: -2px;
+            left: 2px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-light);
+            margin-top: 32px;
+        }
+
+        .action-left {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #d40011;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: #f8fafc;
+            color: var(--primary-dark);
+            border: 2px solid var(--border-light);
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            border-color: var(--text-gray);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-gray);
+            border: 2px solid var(--border-light);
+        }
+
+        .btn-outline:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Error Messages */
+        .error-message {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Success Message */
+        .success-message {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 0 24px;
+            }
+
+            .sidebar {
+                position: static;
+                order: -1;
+            }
+
+            .sidebar-card {
+                margin-bottom: 16px;
+            }
+
+            .primary-categories {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .primary-category {
+                margin-bottom: 0;
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px 16px;
+            }
+
+            .container {
+                padding: 0 16px;
+            }
+
+            .form-content {
+                padding: 20px 16px;
+            }
+
+            .primary-categories {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .action-left,
+            .action-right {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+
+        /* Post Type Selector */
+        .post-type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .post-type-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            border: 2px solid var(--border-light);
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .post-type-option:hover {
+            border-color: var(--primary-color);
+            background: rgba(230, 0, 18, 0.02);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .post-type-option.active {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(230, 0, 18, 0.08) 0%, rgba(230, 0, 18, 0.05) 100%);
+            box-shadow: 0 2px 12px rgba(230, 0, 18, 0.12);
+        }
+
+        .post-type-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--text-gray);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .post-type-option.active .post-type-icon {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #d40011 100%);
+            color: white;
+        }
+
+        .post-type-content {
+            flex: 1;
+        }
+
+        .post-type-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 2px;
+        }
+
+        .post-type-description {
+            font-size: 12px;
+            color: var(--text-gray);
+            line-height: 1.3;
+        }
+
+        .post-type-check {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: transparent;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .post-type-option.active .post-type-check {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .post-type-selector {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .post-type-option {
+                padding: 16px;
+            }
+            
+            .post-type-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+        }
+
+        /* Voting Configuration Styles */
+        .voting-config {
+            background: #f8fafc;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .voting-options {
+            margin-bottom: 16px;
+        }
+
+        .voting-option-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .voting-option-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .voting-option-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(230, 0, 18, 0.1);
+        }
+
+        .remove-option-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: white;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .remove-option-btn:hover:not(:disabled) {
+            background: var(--error-color);
+            color: white;
+            border-color: var(--error-color);
+        }
+
+        .remove-option-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .add-option-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border: 1px dashed var(--border-light);
+            border-radius: 6px;
+            background: white;
+            color: var(--text-gray);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .add-option-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: rgba(230, 0, 18, 0.05);
+        }
+
+        .voting-settings {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .voting-setting-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .voting-setting-row:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Loading State */
+        .loading {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .btn.loading {
+            cursor: not-allowed;
+        }
+
+        .btn.loading::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+    
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="../01-金山 金山云logo-04.png" alt="金山云">
+            </div>
+            <nav class="nav-menu">
+                <a href="../index.html" class="nav-item">首页</a>
+                <div class="nav-dropdown">
+                    <div class="nav-dropdown-trigger">
+                        <a href="#" class="nav-item">AI工具</a>
+                        <img src="../icon/下拉箭头.svg" class="dropdown-arrow" alt="下拉">
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="../ai-tools.html" class="dropdown-item">AI工具库</a>
+                        <a href="../ai-practices.html" class="dropdown-item">AI实战</a>
+                        <a href="../ai-toolkits.html" class="dropdown-item">专题工具箱</a>
+                    </div>
+                </div>
+                <div class="nav-dropdown forum-dropdown">
+                    <div class="nav-dropdown-trigger">
+                        <a href="./forum.html" class="nav-item active">同事论坛</a>
+                        <img src="../icon/下拉箭头.svg" class="dropdown-arrow" alt="下拉">
+                    </div>
+                    <div class="dropdown-menu forum-dropdown-menu">
+                        <div class="forum-dropdown-content">
+                            <div class="forum-dropdown-section">
+                                <h4 class="dropdown-section-title">论坛</h4>
+                                <div class="dropdown-items">
+                                    <a href="./forum.html?category=qa" class="dropdown-item">问答回响</a>
+                                    <a href="./forum.html?category=knowledge" class="dropdown-item">知识分享</a>
+                                    <a href="./forum.html?category=life" class="dropdown-item">生活文娱</a>
+                                </div>
+                            </div>
+                            <div class="forum-dropdown-section">
+                                <h4 class="dropdown-section-title">资讯</h4>
+                                <div class="dropdown-items">
+                                    <a href="./forum.html?tab=news&category=company" class="dropdown-item">公司大事</a>
+                                    <a href="./forum.html?tab=news&category=culture" class="dropdown-item">文化长廊</a>
+                                    <a href="./forum.html?tab=news&category=tech" class="dropdown-item">技术洞察</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#" class="nav-item">学习平台</a>
+                <a href="#" class="nav-item">企业活动</a>
+            </nav>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="搜索...">
+                    <button class="search-btn">
+                        <img src="../icon/搜索.png" alt="搜索" style="width: 16px; height: 16px;">
+                    </button>
+                </div>
+                <button class="notification-btn">
+                    <img src="../icon/通知.png" alt="通知">
+                    <div class="notification-badge"></div>
+                </button>
+                <div class="user-avatar">
+                    <div class="avatar-img" style="background-image: url('../头像/张秋实-技术委员会.png'); background-size: cover; background-position: center;"></div>
+                    <div class="user-dropdown">
+                        <div class="dropdown-item" onclick="window.location.href='../profile.html'">
+                            <img src="../icon/用户.svg" alt="个人中心">
+                            <span>个人中心</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <img src="../icon/目标.svg" alt="我的成就">
+                            <span>我的成就</span>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item">
+                            <img src="../icon/文件夹.svg" alt="设置">
+                            <span>设置</span>
+                        </div>
+                        <div class="dropdown-item" onclick="logout()">
+                            <img src="../icon/时间.svg" alt="退出">
+                            <span>退出登录</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a href="../index.html">企业大平台</a>
+                <i class="fa fa-angle-right"></i>
+                <a href="forum.html">同事论坛</a>
+                <i class="fa fa-angle-right"></i>
+                <span class="current">发布新帖</span>
+            </nav>
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- Category Selection -->
+                <div class="sidebar-card">
+                    <div class="sidebar-header">
+                        <h3 class="sidebar-title">
+                            <i class="fa fa-folder-open"></i>
+                            选择分类
+                        </h3>
+                    </div>
+                    <div class="sidebar-content">
+                        <div class="category-selector">
+                            <div class="primary-categories">
+                                <button type="button" class="primary-category" data-category="qa" id="category-qa">
+                                    <i class="fa fa-question-circle category-icon"></i>
+                                    问答回响
+                                </button>
+                                <button type="button" class="primary-category" data-category="knowledge" id="category-knowledge">
+                                    <i class="fa fa-lightbulb-o category-icon"></i>
+                                    知识分享
+                                </button>
+                                <button type="button" class="primary-category" data-category="life" id="category-life">
+                                    <i class="fa fa-coffee category-icon"></i>
+                                    生活文娱
+                                </button>
+                            </div>
+                            
+                            <div class="secondary-categories hidden" id="secondaryCategories">
+                                <div class="secondary-title">选择二级分类（可选）</div>
+                                <div id="secondaryCategoryList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Publishing Guidelines -->
+                <div class="sidebar-card">
+                    <div class="sidebar-header">
+                        <h3 class="sidebar-title">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            发布须知
+                        </h3>
+                    </div>
+                    <div class="sidebar-content">
+                        <div class="guidelines">
+                            <ul class="guidelines-list">
+                                <li class="guidelines-item">请选择合适的分类，确保帖子内容与分类匹配</li>
+                                <li class="guidelines-item">标题要简洁明了，准确描述帖子内容</li>
+                                <li class="guidelines-item">内容要详实具体，方便其他同事理解和回复</li>
+                                <li class="guidelines-item">上传图片请确保清晰，单张不超过5MB</li>
+                                <li class="guidelines-item">禁止发布与工作无关的广告或不当内容</li>
+                                <li class="guidelines-item">尊重他人，使用文明用语进行交流</li>
+                                <li class="guidelines-item">如有紧急事务，建议直接联系相关负责人</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="main-content-area">
+                <!-- Success Message -->
+                <div id="successMessage" class="success-message">
+                    <i class="fa fa-check-circle"></i>
+                    帖子发布成功！即将跳转到论坛首页...
+                </div>
+
+                <!-- Post Form -->
+                <div class="post-form-container">
+                <div class="form-header">
+                    <h1 class="form-title">
+                        <i class="fa fa-edit"></i>
+                        发布新帖
+                    </h1>
+                    <p class="form-subtitle">分享您的想法、经验或提出问题，与同事们互动交流</p>
+                </div>
+
+                <form id="postForm" class="form-content">
+                    <!-- Post Type Selection -->
+                    <div class="form-section">
+                        <h3 class="section-title required">
+                            <i class="fa fa-edit"></i>
+                            选择帖子类型
+                        </h3>
+                        <div class="post-type-selector">
+                            <div class="post-type-option active" data-type="normal" onclick="selectPostType('normal', this)">
+                                <div class="post-type-icon">
+                                    <i class="fa fa-file-text-o"></i>
+                                </div>
+                                <div class="post-type-content">
+                                    <div class="post-type-title">普通帖子</div>
+                                    <div class="post-type-description">发布文字、图片等内容与同事交流</div>
+                                </div>
+                                <div class="post-type-check">
+                                    <i class="fa fa-check"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="post-type-option" data-type="voting" onclick="selectPostType('voting', this)">
+                                <div class="post-type-icon">
+                                    <i class="fa fa-bar-chart"></i>
+                                </div>
+                                <div class="post-type-content">
+                                    <div class="post-type-title">投票帖子</div>
+                                    <div class="post-type-description">发起投票，收集同事的意见和建议</div>
+                                </div>
+                                <div class="post-type-check">
+                                    <i class="fa fa-check"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post Title -->
+                    <div class="form-section">
+                        <h3 class="section-title required">
+                            <i class="fa fa-header"></i>
+                            帖子标题
+                        </h3>
+                        <div class="form-group">
+                            <input type="text" 
+                                   id="postTitle" 
+                                   name="postTitle" 
+                                   class="form-input" 
+                                   placeholder="请输入帖子标题（5-50个字符）" 
+                                   maxlength="50" 
+                                   required>
+                            <div class="error-message" id="postTitleError">请输入帖子标题（5-50个字符）</div>
+                        </div>
+                    </div>
+
+                    <!-- Post Content -->
+                    <div class="form-section" data-section="content">
+                        <h3 class="section-title required">
+                            <i class="fa fa-file-text-o"></i>
+                            帖子内容
+                        </h3>
+                        <div class="editor-container" id="editorContainer">
+                            <div class="editor-toolbar">
+                                <div class="toolbar-group">
+                                    <button type="button" class="toolbar-btn" data-action="bold" title="粗体">
+                                        <i class="fa fa-bold"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" data-action="italic" title="斜体">
+                                        <i class="fa fa-italic"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" data-action="underline" title="下划线">
+                                        <i class="fa fa-underline"></i>
+                                    </button>
+                                </div>
+                                <div class="toolbar-group">
+                                    <button type="button" class="toolbar-btn" data-action="insertUnorderedList" title="无序列表">
+                                        <i class="fa fa-list-ul"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" data-action="insertOrderedList" title="有序列表">
+                                        <i class="fa fa-list-ol"></i>
+                                    </button>
+                                </div>
+                                <div class="toolbar-group">
+                                    <button type="button" class="toolbar-btn" data-action="createLink" title="插入链接">
+                                        <i class="fa fa-link"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" data-action="insertCode" title="插入代码">
+                                        <i class="fa fa-code"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" data-action="insertHorizontalRule" title="分割线">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="editor-content" 
+                                 id="postContent" 
+                                 contenteditable="true"></div>
+                        </div>
+                        <div class="error-message" id="postContentError">请输入帖子内容（至少10个字符）</div>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="form-section" id="uploadSection">
+                        <h3 class="section-title">
+                            <i class="fa fa-paperclip"></i>
+                            上传附件/图片
+                        </h3>
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-icon">
+                                <i class="fa fa-cloud-upload"></i>
+                            </div>
+                            <div class="upload-text">点击上传或拖拽文件到此区域</div>
+                            <div class="upload-hint">支持图片（JPG、PNG、GIF）和文档（PDF、DOC、XLS）格式，单个文件不超过 10MB</div>
+                            <input type="file" 
+                                   id="imageInput" 
+                                   class="file-input" 
+                                   multiple 
+                                   accept="image/jpeg,image/png,image/gif,application/pdf,.doc,.docx,.xls,.xlsx">
+                        </div>
+                        <div class="image-preview" id="imagePreview"></div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="form-section" id="tagsSection">
+                        <h3 class="section-title">
+                            <i class="fa fa-tags"></i>
+                            添加标签
+                        </h3>
+                        <div class="tags-container" id="tagsContainer">
+                            <input type="text" 
+                                   class="tag-input" 
+                                   id="tagInput" 
+                                   placeholder="输入标签后按回车添加，最多5个标签">
+                        </div>
+                        <div class="upload-hint">标签有助于其他用户找到您的帖子</div>
+                    </div>
+
+                    <!-- Post Settings -->
+                    <div class="form-section" id="postSettingsSection">
+                        <h3 class="section-title">
+                            <i class="fa fa-cog"></i>
+                            帖子设置
+                        </h3>
+                        <div class="post-settings">
+                            <!-- 普通帖子设置 -->
+                            <div class="settings-grid" id="normalPostSettings">
+                                <div class="setting-item">
+                                    <div>
+                                        <div class="setting-label">
+                                            <i class="fa fa-eye"></i>
+                                            允许游客查看
+                                        </div>
+                                        <div class="setting-description">允许未登录用户查看此帖子</div>
+                                    </div>
+                                    <div class="toggle-switch" id="allowGuestView" onclick="toggleSetting(this)"></div>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div>
+                                        <div class="setting-label">
+                                            <i class="fa fa-bell"></i>
+                                            邮件通知回复
+                                        </div>
+                                        <div class="setting-description">有人回复时发送邮件通知</div>
+                                    </div>
+                                    <div class="toggle-switch active" id="emailNotification" onclick="toggleSetting(this)"></div>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div>
+                                        <div class="setting-label">
+                                            <i class="fa fa-thumbs-up"></i>
+                                            允许点赞
+                                        </div>
+                                        <div class="setting-description">允许其他用户为帖子点赞</div>
+                                    </div>
+                                    <div class="toggle-switch active" id="allowLikes" onclick="toggleSetting(this)"></div>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div>
+                                        <div class="setting-label">
+                                            <i class="fa fa-comments"></i>
+                                            允许评论
+                                        </div>
+                                        <div class="setting-description">允许其他用户评论此帖子</div>
+                                    </div>
+                                    <div class="toggle-switch active" id="allowComments" onclick="toggleSetting(this)"></div>
+                                </div>
+                                
+                                <div class="setting-item" id="votingToggleItem">
+                                    <div>
+                                        <div class="setting-label">
+                                            <i class="fa fa-bar-chart"></i>
+                                            添加投票功能
+                                        </div>
+                                        <div class="setting-description">为普通帖子添加投票功能</div>
+                                    </div>
+                                    <div class="toggle-switch" id="enableVoting" onclick="toggleVoting(this)"></div>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div>
+                                        <div class="setting-label">
+                                            <img src="../icon/收藏.png" style="width: 16px; height: 16px;" alt="置顶申请">
+                                            置顶申请
+                                        </div>
+                                        <div class="setting-description">申请将帖子置顶显示</div>
+                                    </div>
+                                    <div class="toggle-switch" id="requestPin" onclick="toggleSetting(this)"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- 投票帖子设置 -->
+                            <div class="settings-grid" id="votingPostSettings" style="display: none;">
+                                <div class="setting-item">
+                                    <div>
+                                        <div class="setting-label">
+                                            <i class="fa fa-eye"></i>
+                                            允许游客查看
+                                        </div>
+                                        <div class="setting-description">允许未登录用户查看此投票</div>
+                                    </div>
+                                    <div class="toggle-switch" id="allowGuestViewVoting" onclick="toggleSetting(this)"></div>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div>
+                                        <div class="setting-label">
+                                            <i class="fa fa-bell"></i>
+                                            邮件通知投票
+                                        </div>
+                                        <div class="setting-description">有新投票时发送邮件通知</div>
+                                    </div>
+                                    <div class="toggle-switch active" id="emailNotificationVoting" onclick="toggleSetting(this)"></div>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div>
+                                        <div class="setting-label">
+                                            <i class="fa fa-comments"></i>
+                                            允许评论讨论
+                                        </div>
+                                        <div class="setting-description">允许用户对投票进行评论讨论</div>
+                                    </div>
+                                    <div class="toggle-switch active" id="allowCommentsVoting" onclick="toggleSetting(this)"></div>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div>
+                                        <div class="setting-label">
+                                            <i class="fa fa-users"></i>
+                                            匿名投票
+                                        </div>
+                                        <div class="setting-description">隐藏投票者身份，保护隐私</div>
+                                    </div>
+                                    <div class="toggle-switch" id="anonymousVoting" onclick="toggleSetting(this)"></div>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div>
+                                        <div class="setting-label">
+                                            <i class="fa fa-refresh"></i>
+                                            允许改投
+                                        </div>
+                                        <div class="setting-description">允许用户修改已投的选项</div>
+                                    </div>
+                                    <div class="toggle-switch active" id="allowRevote" onclick="toggleSetting(this)"></div>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div>
+                                        <div class="setting-label">
+                                            <i class="fa fa-bookmark-o"></i>
+                                            置顶申请
+                                        </div>
+                                        <div class="setting-description">申请将投票置顶显示</div>
+                                    </div>
+                                    <div class="toggle-switch" id="requestPinVoting" onclick="toggleSetting(this)"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voting Configuration -->
+                    <div class="form-section" id="votingSection" style="display: none;">
+                        <h3 class="section-title">
+                            <i class="fa fa-bar-chart"></i>
+                            投票配置
+                        </h3>
+                        <div class="voting-config">
+                            <div class="form-group">
+                                <label class="form-label required">投票问题</label>
+                                <input type="text" 
+                                       id="votingQuestion" 
+                                       class="form-input" 
+                                       placeholder="请输入投票问题..."
+                                       maxlength="100">
+                                <div class="error-message" id="votingQuestionError">请输入投票问题</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label required">投票选项</label>
+                                <div id="votingOptions" class="voting-options">
+                                    <div class="voting-option-item">
+                                        <input type="text" 
+                                               class="voting-option-input" 
+                                               placeholder="选项 1..."
+                                               maxlength="50">
+                                        <button type="button" class="remove-option-btn" onclick="removeVotingOption(this)" disabled>
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="voting-option-item">
+                                        <input type="text" 
+                                               class="voting-option-input" 
+                                               placeholder="选项 2..."
+                                               maxlength="50">
+                                        <button type="button" class="remove-option-btn" onclick="removeVotingOption(this)" disabled>
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" class="add-option-btn" id="addOptionBtn" onclick="addVotingOption()">
+                                    <i class="fa fa-plus"></i>
+                                    添加选项
+                                </button>
+                                <div class="error-message" id="votingOptionsError">至少需要2个投票选项</div>
+                            </div>
+                            
+                            <div class="voting-settings">
+                                <div class="voting-setting-row">
+                                    <div class="form-group" style="flex: 1;">
+                                        <label class="form-label">投票类型</label>
+                                        <select id="votingType" class="form-input">
+                                            <option value="single">单选</option>
+                                            <option value="multiple">多选</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="flex: 1;" id="maxChoicesGroup" style="display: none;">
+                                        <label class="form-label">最多选择</label>
+                                        <input type="number" 
+                                               id="maxChoices" 
+                                               class="form-input" 
+                                               min="2" 
+                                               max="10" 
+                                               value="3">
+                                    </div>
+                                </div>
+                                
+                                <div class="voting-setting-row">
+                                    <div class="form-group" style="flex: 1;">
+                                        <label class="form-label">结束时间</label>
+                                        <input type="datetime-local" 
+                                               id="votingEndTime" 
+                                               class="form-input">
+                                    </div>
+                                    <div class="form-group" style="flex: 1;">
+                                        <div class="setting-item" style="padding: 12px 0;">
+                                            <div class="setting-label">
+                                                <i class="fa fa-eye"></i>
+                                                显示实时结果
+                                            </div>
+                                            <div class="toggle-switch active" id="showResults" onclick="toggleSetting(this)"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <div class="action-left">
+                            <button type="button" class="btn btn-outline" id="saveDraftBtn">
+                                <i class="fa fa-save"></i>
+                                保存草稿
+                            </button>
+                        </div>
+                        <div class="action-right">
+                            <a href="forum.html" class="btn btn-secondary">
+                                <i class="fa fa-times"></i>
+                                取消
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fa fa-send"></i>
+                                发布帖子
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 分类数据配置 - 与forum.html保持一致
+        const categoryConfig = {
+            qa: {
+                name: '问答回响',
+                subcategories: [
+                    { value: '财务', label: '财务' },
+                    { value: 'IT', label: 'IT' },
+                    { value: 'HR', label: 'HR' },
+                    { value: '行政', label: '行政' },
+                    { value: '其他', label: '其他' }
+                ]
+            },
+            knowledge: {
+                name: '知识分享',
+                subcategories: [
+                    { value: '研发', label: '研发' },
+                    { value: '产品', label: '产品' },
+                    { value: 'AI', label: 'AI' },
+                    { value: '通用', label: '通用' }
+                ]
+            },
+            life: {
+                name: '生活文娱',
+                subcategories: []
+            }
+        };
+
+        // 全局变量
+        let uploadedImages = [];
+        let tags = [];
+        let selectedPrimaryCategory = '';
+        let selectedSecondaryCategory = '';
+        let selectedPostType = 'normal';
+        let postSettings = {
+            // 普通帖子设置
+            allowGuestView: false,
+            emailNotification: true,
+            allowLikes: true,
+            allowComments: true,
+            enableVoting: false,
+            requestPin: false,
+            
+            // 投票帖子设置
+            allowGuestViewVoting: false,
+            emailNotificationVoting: true,
+            allowCommentsVoting: true,
+            anonymousVoting: false,
+            allowRevote: true,
+            requestPinVoting: false,
+            showResults: true
+        };
+
+        let votingConfig = {
+            question: '',
+            options: [],
+            type: 'single',
+            maxChoices: 3,
+            endTime: null,
+            showResults: true
+        };
+
+        // DOM 元素
+        const postForm = document.getElementById('postForm');
+        const secondaryCategories = document.getElementById('secondaryCategories');
+        const secondaryCategoryList = document.getElementById('secondaryCategoryList');
+        const editorContainer = document.getElementById('editorContainer');
+        const postContent = document.getElementById('postContent');
+        const uploadArea = document.getElementById('uploadArea');
+        const imageInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const tagsContainer = document.getElementById('tagsContainer');
+        const tagInput = document.getElementById('tagInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMessage = document.getElementById('successMessage');
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeForm();
+        });
+
+        function initializeForm() {
+            setupPostTypeHandlers();
+            setupCategoryHandlers();
+            setupRichTextEditor();
+            setupImageUpload();
+            setupTagsInput();
+            setupFormValidation();
+            setupPostSettings();
+            setupVotingHandlers();
+        }
+
+        // 帖子类型选择处理
+        function setupPostTypeHandlers() {
+            // 初始化时确保普通帖子被选中
+            selectPostType('normal');
+        }
+
+        function selectPostType(type, element) {
+            selectedPostType = type;
+            
+            // 更新选中状态
+            document.querySelectorAll('.post-type-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            
+            // 如果没有传入element，通过data-type找到对应元素
+            if (!element) {
+                element = document.querySelector(`[data-type="${type}"]`);
+            }
+            
+            if (element) {
+                element.classList.add('active');
+            }
+            
+            // 控制投票相关界面显示
+            const votingSection = document.getElementById('votingSection');
+            
+            if (type === 'voting') {
+                // 自动开启投票功能
+                postSettings.enableVoting = true;
+                votingSection.style.display = 'block';
+                
+                // 设置默认的结束时间为24小时后
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                document.getElementById('votingEndTime').value = tomorrow.toISOString().slice(0, 16);
+                
+                // 更新表单标题
+                document.querySelector('.form-title').innerHTML = '<i class="fa fa-bar-chart"></i> 发布投票帖';
+                document.querySelector('.form-subtitle').textContent = '创建投票，收集同事们的意见和建议';
+                
+                // 更新帖子标题占位符
+                document.getElementById('postTitle').placeholder = '请输入投票标题（5-50个字符）';
+                
+                // 更新内容编辑器占位符
+                updateEditorPlaceholder('请描述投票的背景信息、具体问题或相关说明...');
+                
+                // 调整某些功能的显示
+                updateFeaturesForVoting(true);
+            } else {
+                // 关闭投票功能
+                postSettings.enableVoting = false;
+                votingSection.style.display = 'none';
+                
+                // 更新表单标题
+                document.querySelector('.form-title').innerHTML = '<i class="fa fa-edit"></i> 发布新帖';
+                document.querySelector('.form-subtitle').textContent = '分享您的想法、经验或提出问题，与同事们互动交流';
+                
+                // 更新帖子标题占位符
+                document.getElementById('postTitle').placeholder = '请输入帖子标题（5-50个字符）';
+                
+                // 更新内容编辑器占位符
+                updateEditorPlaceholder('请输入帖子内容，支持富文本编辑...');
+                
+                // 调整某些功能的显示
+                updateFeaturesForVoting(false);
+            }
+            
+            console.log('选择了帖子类型:', type);
+        }
+
+        function updateEditorPlaceholder(text) {
+            // 更新CSS中的占位符文本
+            const style = document.createElement('style');
+            style.textContent = `
+                .editor-content:empty::before {
+                    content: "${text}";
+                    color: #9ca3af;
+                    pointer-events: none;
+                }
+            `;
+            
+            // 移除之前的占位符样式
+            const oldStyle = document.querySelector('style[data-placeholder="true"]');
+            if (oldStyle) {
+                oldStyle.remove();
+            }
+            
+            style.setAttribute('data-placeholder', 'true');
+            document.head.appendChild(style);
+        }
+
+        function updateFeaturesForVoting(isVoting) {
+            // 根据帖子类型调整某些功能的显示和标签
+            const uploadSectionTitle = document.querySelector('#uploadSection .section-title');
+            const tagsSection = document.querySelector('#tagsSection');
+            const contentSectionTitle = document.querySelector('[data-section="content"] .section-title');
+            
+            // 控制设置区域的显示
+            const normalPostSettings = document.getElementById('normalPostSettings');
+            const votingPostSettings = document.getElementById('votingPostSettings');
+            
+            if (isVoting) {
+                // 投票帖相关调整
+                if (uploadSectionTitle) {
+                    uploadSectionTitle.innerHTML = '<i class="fa fa-paperclip"></i> 上传附件/图片（可选）';
+                }
+                if (tagsSection) {
+                    tagsSection.querySelector('.section-title').innerHTML = '<i class="fa fa-tags"></i> 添加标签（推荐）';
+                    tagsSection.querySelector('.upload-hint').textContent = '添加相关标签有助于用户快速找到此投票';
+                }
+                if (contentSectionTitle) {
+                    contentSectionTitle.innerHTML = '<i class="fa fa-file-text-o"></i> 投票说明';
+                }
+                
+                // 切换设置区域
+                if (normalPostSettings) normalPostSettings.style.display = 'none';
+                if (votingPostSettings) votingPostSettings.style.display = 'grid';
+                
+                // 为投票帖子添加内容提示
+                updateContentSectionHint(true);
+            } else {
+                // 普通帖相关调整
+                if (uploadSectionTitle) {
+                    uploadSectionTitle.innerHTML = '<i class="fa fa-paperclip"></i> 上传附件/图片';
+                }
+                if (tagsSection) {
+                    tagsSection.querySelector('.section-title').innerHTML = '<i class="fa fa-tags"></i> 添加标签';
+                    tagsSection.querySelector('.upload-hint').textContent = '标签有助于其他用户找到您的帖子';
+                }
+                if (contentSectionTitle) {
+                    contentSectionTitle.innerHTML = '<i class="fa fa-file-text-o"></i> 帖子内容';
+                }
+                
+                // 切换设置区域
+                if (normalPostSettings) normalPostSettings.style.display = 'grid';
+                if (votingPostSettings) votingPostSettings.style.display = 'none';
+                
+                // 移除投票帖子的内容提示
+                updateContentSectionHint(false);
+            }
+        }
+
+        function updateContentSectionHint(isVoting) {
+            const contentSection = document.querySelector('[data-section="content"]');
+            if (!contentSection) return;
+            
+            // 移除现有提示
+            const existingHint = contentSection.querySelector('.voting-content-hint');
+            if (existingHint) {
+                existingHint.remove();
+            }
+            
+            if (isVoting) {
+                // 为投票帖添加内容提示
+                const hint = document.createElement('div');
+                hint.className = 'voting-content-hint';
+                hint.style.cssText = `
+                    background: linear-gradient(135deg, #fef7f0 0%, #fdf2f8 100%);
+                    border: 1px solid #fed7aa;
+                    border-radius: 8px;
+                    padding: 12px 16px;
+                    margin-bottom: 16px;
+                    font-size: 13px;
+                    color: #7c2d12;
+                    line-height: 1.5;
+                `;
+                hint.innerHTML = `
+                    <i class="fa fa-lightbulb-o" style="color: #ea580c; margin-right: 6px;"></i>
+                    <strong>提示：</strong>请简要描述投票背景、目的或相关说明信息。投票的具体选项将在下方的"投票配置"中设置。
+                `;
+                
+                const editorContainer = contentSection.querySelector('.editor-container');
+                contentSection.insertBefore(hint, editorContainer);
+            }
+        }
+
+        // 分类处理
+        function setupCategoryHandlers() {
+            // 绑定一级分类按钮事件
+            document.querySelectorAll('.primary-category').forEach(button => {
+                button.addEventListener('click', function() {
+                    const categoryValue = this.dataset.category;
+                    selectPrimaryCategory(categoryValue);
+                });
+            });
+        }
+
+        function selectPrimaryCategory(categoryValue) {
+            // 更新选中状态
+            document.querySelectorAll('.primary-category').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.getElementById(`category-${categoryValue}`).classList.add('selected');
+            
+            selectedPrimaryCategory = categoryValue;
+            selectedSecondaryCategory = ''; // 重置二级分类
+            
+            // 显示/隐藏二级分类
+            updateSecondaryCategories(categoryValue);
+            
+            console.log('选择了一级分类:', categoryValue);
+        }
+
+        function updateSecondaryCategories(primaryValue) {
+            const config = categoryConfig[primaryValue];
+            
+            if (config && config.subcategories.length > 0) {
+                // 有二级分类，显示二级分类选项
+                secondaryCategories.classList.remove('hidden');
+                
+                // 清空并重新生成二级分类按钮
+                secondaryCategoryList.innerHTML = '';
+                config.subcategories.forEach(sub => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'secondary-category';
+                    button.dataset.subcategory = sub.value;
+                    button.textContent = sub.label;
+                    button.addEventListener('click', function() {
+                        selectSecondaryCategory(sub.value);
+                    });
+                    secondaryCategoryList.appendChild(button);
+                });
+            } else {
+                // 无二级分类，隐藏二级分类区域
+                secondaryCategories.classList.add('hidden');
+            }
+        }
+
+        function selectSecondaryCategory(subcategoryValue) {
+            // 更新选中状态
+            document.querySelectorAll('.secondary-category').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            if (selectedSecondaryCategory === subcategoryValue) {
+                // 如果点击的是已选中的二级分类，则取消选择
+                selectedSecondaryCategory = '';
+            } else {
+                // 选择新的二级分类
+                selectedSecondaryCategory = subcategoryValue;
+                event.target.classList.add('selected');
+            }
+            
+            console.log('选择了二级分类:', selectedSecondaryCategory);
+        }
+
+        // 富文本编辑器
+        function setupRichTextEditor() {
+            // 工具栏按钮事件
+            document.querySelectorAll('.toolbar-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const action = this.dataset.action;
+                    executeCommand(action);
+                    this.classList.toggle('active');
+                });
+            });
+
+            // 编辑器焦点事件
+            postContent.addEventListener('focus', function() {
+                editorContainer.classList.add('focused');
+                clearError('postContent');
+            });
+
+            postContent.addEventListener('blur', function() {
+                editorContainer.classList.remove('focused');
+            });
+
+            // 阻止默认的粘贴行为，清理格式
+            postContent.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+                document.execCommand('insertText', false, text);
+            });
+        }
+
+        function executeCommand(command) {
+            if (command === 'createLink') {
+                const url = prompt('请输入链接地址:');
+                if (url) {
+                    document.execCommand(command, false, url);
+                }
+            } else if (command === 'insertCode') {
+                insertCodeBlock();
+            } else {
+                document.execCommand(command, false, null);
+            }
+            postContent.focus();
+        }
+
+        function insertCodeBlock() {
+            const codeContent = prompt('请输入代码内容:');
+            if (codeContent) {
+                const selection = window.getSelection();
+                const range = selection.getRangeAt(0);
+                
+                const codeBlock = document.createElement('pre');
+                codeBlock.className = 'code-block';
+                codeBlock.textContent = codeContent;
+                codeBlock.contentEditable = false;
+                
+                range.deleteContents();
+                range.insertNode(codeBlock);
+                
+                // 在代码块后添加一个换行，让用户可以继续输入
+                const br = document.createElement('br');
+                range.setStartAfter(codeBlock);
+                range.insertNode(br);
+                range.setStartAfter(br);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+
+        // 图片上传
+        function setupImageUpload() {
+            // 点击上传
+            uploadArea.addEventListener('click', function() {
+                imageInput.click();
+            });
+
+            // 文件选择
+            imageInput.addEventListener('change', function() {
+                const files = Array.from(this.files);
+                handleFiles(files);
+            });
+
+            // 拖拽上传
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', function() {
+                this.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                const files = Array.from(e.dataTransfer.files);
+                handleFiles(files);
+            });
+        }
+
+        function handleFiles(files) {
+            files.forEach(file => {
+                const isImage = file.type.startsWith('image/');
+                const isDocument = [
+                    'application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/vnd.ms-excel',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                ].includes(file.type);
+                
+                if (!isImage && !isDocument) {
+                    alert('不支持的文件格式');
+                    return;
+                }
+                
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('文件大小不能超过 10MB');
+                    return;
+                }
+                
+                if (uploadedImages.length >= 9) {
+                    alert('最多只能上传 9 个文件');
+                    return;
+                }
+                
+                if (isImage) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const fileData = {
+                            file: file,
+                            url: e.target.result,
+                            type: 'image',
+                            name: file.name,
+                            id: Date.now() + Math.random()
+                        };
+                        uploadedImages.push(fileData);
+                        renderImagePreview();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // 文档文件不需要预览，直接添加
+                    const fileData = {
+                        file: file,
+                        url: null,
+                        type: 'document',
+                        name: file.name,
+                        size: Math.round(file.size / 1024) + 'KB',
+                        id: Date.now() + Math.random()
+                    };
+                    uploadedImages.push(fileData);
+                    renderImagePreview();
+                }
+            });
+        }
+
+        function renderImagePreview() {
+            imagePreview.innerHTML = '';
+            uploadedImages.forEach(file => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                
+                if (file.type === 'image') {
+                    previewItem.innerHTML = `
+                        <img src="${file.url}" alt="预览图片" class="preview-image">
+                        <button type="button" class="remove-image" onclick="removeImage('${file.id}')">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    `;
+                } else {
+                    // 文档文件显示文件信息
+                    const fileIcon = getFileIcon(file.name);
+                    previewItem.innerHTML = `
+                        <div class="file-preview">
+                            <div class="file-icon">
+                                <i class="fa ${fileIcon}"></i>
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name">${file.name}</div>
+                                <div class="file-size">${file.size}</div>
+                            </div>
+                        </div>
+                        <button type="button" class="remove-image" onclick="removeImage('${file.id}')">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    `;
+                }
+                
+                imagePreview.appendChild(previewItem);
+            });
+        }
+
+        function getFileIcon(filename) {
+            const extension = filename.split('.').pop().toLowerCase();
+            const iconMap = {
+                'pdf': 'fa-file-pdf-o',
+                'doc': 'fa-file-word-o',
+                'docx': 'fa-file-word-o',
+                'xls': 'fa-file-excel-o',
+                'xlsx': 'fa-file-excel-o'
+            };
+            return iconMap[extension] || 'fa-file-o';
+        }
+
+        function removeImage(imageId) {
+            uploadedImages = uploadedImages.filter(img => img.id !== imageId);
+            renderImagePreview();
+        }
+
+        // 标签输入
+        function setupTagsInput() {
+            tagInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    addTag(this.value.trim());
+                    this.value = '';
+                }
+            });
+
+            tagInput.addEventListener('blur', function() {
+                if (this.value.trim()) {
+                    addTag(this.value.trim());
+                    this.value = '';
+                }
+            });
+
+            tagsContainer.addEventListener('click', function() {
+                tagInput.focus();
+            });
+        }
+
+        function addTag(tagText) {
+            if (!tagText || tags.length >= 5) return;
+            if (tags.includes(tagText)) {
+                alert('标签已存在');
+                return;
+            }
+
+            tags.push(tagText);
+            renderTags();
+        }
+
+        function removeTag(index) {
+            tags.splice(index, 1);
+            renderTags();
+        }
+
+        function renderTags() {
+            const existingTags = tagsContainer.querySelectorAll('.tag-item');
+            existingTags.forEach(tag => tag.remove());
+
+            tags.forEach((tag, index) => {
+                const tagElement = document.createElement('div');
+                tagElement.className = 'tag-item';
+                tagElement.innerHTML = `
+                    ${tag}
+                    <button type="button" class="tag-remove" onclick="removeTag(${index})">
+                        <i class="fa fa-times"></i>
+                    </button>
+                `;
+                tagsContainer.insertBefore(tagElement, tagInput);
+            });
+        }
+
+        // 表单验证
+        function setupFormValidation() {
+            postForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (validateForm()) {
+                    submitPost();
+                }
+            });
+        }
+
+        function validateForm() {
+            let isValid = true;
+
+            // 验证一级分类
+            if (!selectedPrimaryCategory) {
+                alert('请选择一级分类');
+                // 滚动到分类选择区域
+                document.querySelector('.sidebar').scrollIntoView({ behavior: 'smooth' });
+                isValid = false;
+            }
+
+            // 验证标题
+            const title = document.getElementById('postTitle').value.trim();
+            if (!title || title.length < 5) {
+                showError('postTitle', '请输入帖子标题（5-50个字符）');
+                isValid = false;
+            }
+
+            // 验证内容
+            const content = postContent.textContent.trim();
+            if (!content || content.length < 10) {
+                showError('postContent', '请输入帖子内容（至少10个字符）');
+                isValid = false;
+            }
+
+            // 验证投票功能（如果开启）
+            if (postSettings.enableVoting) {
+                const votingQuestion = document.getElementById('votingQuestion').value.trim();
+                if (!votingQuestion) {
+                    showError('votingQuestion', '请输入投票问题');
+                    isValid = false;
+                }
+
+                const optionInputs = document.querySelectorAll('.voting-option-input');
+                const filledOptions = Array.from(optionInputs).filter(input => input.value.trim());
+                
+                if (filledOptions.length < 2) {
+                    showError('votingOptions', '至少需要2个投票选项');
+                    isValid = false;
+                }
+
+                const endTime = document.getElementById('votingEndTime').value;
+                if (!endTime) {
+                    alert('请设置投票结束时间');
+                    isValid = false;
+                } else {
+                    const endDate = new Date(endTime);
+                    if (endDate <= new Date()) {
+                        alert('投票结束时间必须晚于当前时间');
+                        isValid = false;
+                    }
+                }
+            }
+
+            return isValid;
+        }
+
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(fieldId + 'Error');
+            
+            field.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+
+        function clearError(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(fieldId + 'Error');
+            
+            field.classList.remove('error');
+            errorElement.classList.remove('show');
+        }
+
+        // 提交帖子
+        function submitPost() {
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            // 收集表单数据
+            const formData = {
+                type: selectedPostType,
+                primaryCategory: selectedPrimaryCategory,
+                secondaryCategory: selectedSecondaryCategory,
+                title: document.getElementById('postTitle').value.trim(),
+                content: postContent.innerHTML,
+                attachments: uploadedImages,
+                tags: tags,
+                settings: postSettings,
+                voting: collectVotingData(),
+                timestamp: new Date().toISOString(),
+                author: '当前用户', // 实际应用中从登录状态获取
+                dept: '技术部'      // 实际应用中从用户信息获取
+            };
+
+            console.log('提交的帖子数据:', formData);
+
+            // 模拟提交过程
+            setTimeout(() => {
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+                
+                // 显示成功消息
+                successMessage.classList.add('show');
+                
+                // 清除草稿
+                localStorage.removeItem('forum_draft');
+                
+                // 3秒后跳转到论坛首页
+                setTimeout(() => {
+                    window.location.href = 'forum.html';
+                }, 3000);
+            }, 2000);
+        }
+
+        // 保存草稿
+        document.getElementById('saveDraftBtn').addEventListener('click', function() {
+            const draftData = {
+                postType: selectedPostType,
+                primaryCategory: selectedPrimaryCategory,
+                secondaryCategory: selectedSecondaryCategory,
+                title: document.getElementById('postTitle').value.trim(),
+                content: postContent.innerHTML,
+                tags: tags,
+                voting: selectedPostType === 'voting' ? collectVotingData() : null,
+                timestamp: new Date().toISOString()
+            };
+
+            localStorage.setItem('forum_draft', JSON.stringify(draftData));
+            alert('草稿已保存！');
+        });
+
+        // 加载草稿
+        function loadDraft() {
+            const draftData = localStorage.getItem('forum_draft');
+            if (draftData) {
+                const draft = JSON.parse(draftData);
+                
+                // 加载帖子类型
+                if (draft.postType) {
+                    selectPostType(draft.postType);
+                }
+                
+                // 加载一级分类
+                if (draft.primaryCategory) {
+                    selectPrimaryCategory(draft.primaryCategory);
+                    
+                    // 加载二级分类
+                    setTimeout(() => {
+                        if (draft.secondaryCategory) {
+                            selectSecondaryCategory(draft.secondaryCategory);
+                        }
+                    }, 100);
+                }
+                
+                document.getElementById('postTitle').value = draft.title || '';
+                postContent.innerHTML = draft.content || '';
+                
+                tags = draft.tags || [];
+                renderTags();
+                
+                // 加载投票数据
+                if (draft.voting && draft.postType === 'voting') {
+                    setTimeout(() => {
+                        if (draft.voting.question) {
+                            document.getElementById('votingQuestion').value = draft.voting.question;
+                        }
+                        // 可以在这里加载其他投票设置
+                    }, 200);
+                }
+                
+                console.log('草稿已加载');
+            }
+        }
+
+        // 页面加载时尝试加载草稿
+        window.addEventListener('load', function() {
+            if (localStorage.getItem('forum_draft')) {
+                if (confirm('检测到未完成的草稿，是否加载？')) {
+                    loadDraft();
+                }
+            }
+        });
+
+        // 页面离开时提醒
+        window.addEventListener('beforeunload', function(e) {
+            const hasContent = document.getElementById('postTitle').value.trim() || 
+                             postContent.textContent.trim() ||
+                             uploadedImages.length > 0;
+            
+            if (hasContent) {
+                e.preventDefault();
+                e.returnValue = '您有未保存的内容，确定要离开吗？';
+                return e.returnValue;
+            }
+        });
+
+        // 帖子设置处理
+        function setupPostSettings() {
+            // 设置已经在HTML中通过onclick绑定
+        }
+
+        function toggleSetting(element) {
+            element.classList.toggle('active');
+            const settingId = element.id;
+            postSettings[settingId] = element.classList.contains('active');
+            console.log('设置更新:', settingId, postSettings[settingId]);
+        }
+
+        // 投票功能相关
+        function toggleVoting(element) {
+            element.classList.toggle('active');
+            const isEnabled = element.classList.contains('active');
+            postSettings.enableVoting = isEnabled;
+            
+            const votingSection = document.getElementById('votingSection');
+            if (isEnabled) {
+                votingSection.style.display = 'block';
+                // 设置默认的结束时间为24小时后
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                document.getElementById('votingEndTime').value = tomorrow.toISOString().slice(0, 16);
+            } else {
+                votingSection.style.display = 'none';
+            }
+            
+            console.log('投票功能:', isEnabled);
+        }
+
+        function addVotingOption() {
+            const votingOptions = document.getElementById('votingOptions');
+            const optionCount = votingOptions.children.length;
+            
+            if (optionCount >= 8) {
+                alert('最多只能添加8个选项');
+                return;
+            }
+            
+            const optionItem = document.createElement('div');
+            optionItem.className = 'voting-option-item';
+            optionItem.innerHTML = `
+                <input type="text" 
+                       class="voting-option-input" 
+                       placeholder="选项 ${optionCount + 1}..."
+                       maxlength="50">
+                <button type="button" class="remove-option-btn" onclick="removeVotingOption(this)">
+                    <i class="fa fa-times"></i>
+                </button>
+            `;
+            
+            votingOptions.appendChild(optionItem);
+            updateRemoveButtons();
+        }
+
+        function removeVotingOption(button) {
+            const optionItem = button.parentElement;
+            const votingOptions = document.getElementById('votingOptions');
+            
+            if (votingOptions.children.length > 2) {
+                optionItem.remove();
+                updateRemoveButtons();
+                updateOptionPlaceholders();
+            }
+        }
+
+        function updateRemoveButtons() {
+            const votingOptions = document.getElementById('votingOptions');
+            const removeButtons = votingOptions.querySelectorAll('.remove-option-btn');
+            
+            // 如果只有2个选项，禁用删除按钮
+            if (votingOptions.children.length <= 2) {
+                removeButtons.forEach(btn => btn.disabled = true);
+            } else {
+                removeButtons.forEach(btn => btn.disabled = false);
+            }
+        }
+
+        function updateOptionPlaceholders() {
+            const votingOptions = document.getElementById('votingOptions');
+            const inputs = votingOptions.querySelectorAll('.voting-option-input');
+            
+            inputs.forEach((input, index) => {
+                input.placeholder = `选项 ${index + 1}...`;
+            });
+        }
+
+        // 投票类型变化处理
+        function setupVotingHandlers() {
+            const votingType = document.getElementById('votingType');
+            const maxChoicesGroup = document.getElementById('maxChoicesGroup');
+            
+            votingType.addEventListener('change', function() {
+                if (this.value === 'multiple') {
+                    maxChoicesGroup.style.display = 'block';
+                } else {
+                    maxChoicesGroup.style.display = 'none';
+                }
+            });
+        }
+
+        // 收集投票数据
+        function collectVotingData() {
+            if (!postSettings.enableVoting) return null;
+            
+            const question = document.getElementById('votingQuestion').value.trim();
+            const optionInputs = document.querySelectorAll('.voting-option-input');
+            const options = [];
+            
+            optionInputs.forEach(input => {
+                const value = input.value.trim();
+                if (value) {
+                    options.push(value);
+                }
+            });
+            
+            return {
+                question: question,
+                options: options,
+                type: document.getElementById('votingType').value,
+                maxChoices: document.getElementById('maxChoices').value,
+                endTime: document.getElementById('votingEndTime').value,
+                showResults: document.getElementById('showResults').classList.contains('active')
+            };
+        }
+
+        // 暴露全局函数供HTML调用
+        window.removeImage = removeImage;
+        window.removeTag = removeTag;
+        window.toggleSetting = toggleSetting;
+        window.toggleVoting = toggleVoting;
+        window.addVotingOption = addVotingOption;
+        window.removeVotingOption = removeVotingOption;
+        window.selectPostType = selectPostType;
+    </script>
+</body>
+</html>
